@@ -1,40 +1,44 @@
-# type: ignore
-from fastapi import FastAPI, Request, status 
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
-from app.exceptions.response_error import AppException
+from contextlib import asynccontextmanager
 
-app = FastAPI(title="Braves Board API")
+from app.core.config import settings
+from app.core.database import engine, redis_client
+from app.exceptions.response_error import (
+    CustomException,
+    custom_exception_handler,
+    http_exception_handler,
+    validation_exception_handler,
+    global_exception_handler
+)
 
-@app.exception_handler(AppException)
-async def app_exception_handler(request: Request, exc: AppException):
-    return JSONResponse(
-        status_code=exc.status_code,
-        content={"errors": exc.message}
-    )
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    yield
+    await engine.dispose()
+    await redis_client.aclose()
 
-@app.exception_handler(StarletteHTTPException)
-async def http_exception_handler(request: Request, exc: StarletteHTTPException):
-    return JSONResponse(
-        status_code=exc.status_code,
-        content={"errors": exc.detail}
-    )
+app = FastAPI(
+    title="Braves Board API",
+    version="1.0.0",
+    lifespan=lifespan
+)
 
-@app.exception_handler(RequestValidationError)
-async def validation_exception_handler(request: Request, exc: RequestValidationError):
-    return JSONResponse(
-        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-        content={"errors": "Format input tidak valid atau data tidak lengkap"}
-    )
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[settings.FRONTEND_URL],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-@app.exception_handler(Exception)
-async def global_exception_handler(request: Request, exc: Exception):
-    return JSONResponse(
-        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        content={"errors": "Terjadi kesalahan internal pada server"}
-    )
+app.add_exception_handler(CustomException, custom_exception_handler)
+app.add_exception_handler(StarletteHTTPException, http_exception_handler)
+app.add_exception_handler(RequestValidationError, validation_exception_handler)
+app.add_exception_handler(Exception, global_exception_handler)
 
-@app.get("/")
-async def root():
-    return {"message": "Server API berfungsi"}
+@app.get("/api/v1/health")
+async def health_check():
+    return {"status": "ok"}

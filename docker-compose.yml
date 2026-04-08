@@ -12,6 +12,7 @@ services:
       - .env
     depends_on:
       - db
+      - redis
     restart: always
 
   db:
@@ -27,11 +28,20 @@ services:
       - postgres_data:/var/lib/postgresql/data
     restart: always
 
+  redis:
+    image: redis:7
+    container_name: braves_board_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: always
+
   pgadmin:
     image: dpage/pgadmin4
     container_name: braves_board_pgadmin
     environment:
-      PGADMIN_DEFAULT_EMAIL: heru@bangunindo.com
+      PGADMIN_DEFAULT_EMAIL: admin@bangunindo.com
       PGADMIN_DEFAULT_PASSWORD: admin
     ports:
       - "8080:80"
@@ -44,3 +54,4 @@ services:
 volumes:
   postgres_data:
   pgadmin_data:
+  redis_data:

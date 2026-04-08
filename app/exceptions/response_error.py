@@ -1,27 +1,37 @@
-from fastapi import status # type: ignore
+from fastapi import Request, status
+from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
-class AppException(Exception):
-    """Base exception untuk seluruh error aplikasi."""
+class CustomException(Exception):
     def __init__(self, status_code: int, message: str):
         self.status_code = status_code
         self.message = message
 
-class BadRequestError(AppException):
-    """Status 400: Kesalahan logika bisnis atau parameter input."""
-    def __init__(self, message: str = "Bad Request"):
-        super().__init__(status_code=status.HTTP_400_BAD_REQUEST, message=message)
+def custom_exception_handler(request: Request, exc: CustomException):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"errors": exc.message}
+    )
 
-class UnauthorizedError(AppException):
-    """Status 401: Token JWT tidak ditemukan, tidak valid, atau kedaluwarsa."""
-    def __init__(self, message: str = "Unauthorized"):
-        super().__init__(status_code=status.HTTP_401_UNAUTHORIZED, message=message)
+def http_exception_handler(request: Request, exc: StarletteHTTPException):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"errors": str(exc.detail)}
+    )
 
-class ForbiddenError(AppException):
-    """Status 403: Akses ditolak (domain email tidak valid / IDOR)."""
-    def __init__(self, message: str = "Forbidden"):
-        super().__init__(status_code=status.HTTP_403_FORBIDDEN, message=message)
+def validation_exception_handler(request: Request, exc: RequestValidationError):
+    error_msg = "Format input tidak valid"
+    if len(exc.errors()) > 0:
+        error_msg = f"{exc.errors()[0]['loc'][-1]}: {exc.errors()[0]['msg']}"
+        
+    return JSONResponse(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        content={"errors": error_msg}
+    )
 
-class NotFoundError(AppException):
-    """Status 404: Sumber daya tidak ditemukan di database."""
-    def __init__(self, message: str = "Not Found"):
-        super().__init__(status_code=status.HTTP_404_NOT_FOUND, message=message)
+def global_exception_handler(request: Request, exc: Exception):
+    return JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content={"errors": "Terjadi kesalahan internal pada server"}
+    )
