@@ -16,6 +16,7 @@ python-dotenv==1.0.1
 pydantic-settings==2.5.2
 
 redis==5.0.3
+types-redis
 google-cloud-storage==2.14.0
 
 itsdangerous==2.2.0
