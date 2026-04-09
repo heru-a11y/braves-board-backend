@@ -1,0 +1,7 @@
+INVALID_CREDENTIALS = "Kredensial tidak valid"
+TOKEN_EXPIRED = "Token telah kedaluwarsa"
+GOOGLE_FAILED = "Gagal menghasilkan URL autentikasi Google"
+GOOGLE_CODE_INVALID = "Kode autentikasi Google tidak valid"
+FORBIDDEN_DOMAIN = "Akses ditolak. Akses hanya untuk akun resmi perusahaan."
+TOKEN_INVALID = "Token tidak valid atau telah kedaluwarsa"
+REFRESH_TOKEN_INVALID = "Refresh token tidak valid atau telah kedaluwarsa"
