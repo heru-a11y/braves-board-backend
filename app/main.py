@@ -22,7 +22,3 @@ setup_cors(app)
 setup_exception_handlers(app)
 
 app.include_router(auth.router)
-
-@app.get("/api/v1/health")
-async def health_check():
-    return {"status": "ok"}

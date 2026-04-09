@@ -1,6 +1,7 @@
 import httpx
 import urllib.parse
-from fastapi import status
+import uuid
+from jose import jwt, JWTError
 from app.core.config import settings
 from app.repositories.user_repository import UserRepository
 from app.schemas.user import UserCreate
@@ -8,7 +9,8 @@ from app.utils import jwt_utils
 from app.exceptions.auth_exceptions import (
     GoogleAuthException, 
     InvalidGoogleCodeException, 
-    ForbiddenDomainException
+    ForbiddenDomainException,
+    InvalidRefreshTokenException
 )
 
 class AuthService:
@@ -80,7 +82,7 @@ class AuthService:
                 "refresh_token": refresh_token,
                 "expires_in": settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60
             }
-        # 1. Tukar Code dengan Token Google
+
         async with httpx.AsyncClient() as client:
             token_url = "https://oauth2.googleapis.com/token"
             data = {
@@ -97,7 +99,6 @@ class AuthService:
             google_tokens = res.json()
             access_token = google_tokens.get("access_token")
 
-            # 2. Ambil Profil User dari Google
             user_info_res = await client.get(
                 "https://www.googleapis.com/oauth2/v3/userinfo",
                 headers={"Authorization": f"Bearer {access_token}"}
@@ -105,11 +106,9 @@ class AuthService:
             profile = user_info_res.json()
             email = profile.get("email")
 
-            # 3. Validasi Domain @bangunindo.com [cite: 736]
             if not email or not email.endswith("@bangunindo.com"):
                 raise ForbiddenDomainException()
 
-            # 4. Upsert User ke Database [cite: 739]
             user = await user_repo.get_by_google_id(profile.get("sub"))
             if not user:
                 user_in = UserCreate(
@@ -120,7 +119,6 @@ class AuthService:
                 )
                 user = await user_repo.create(user_in)
             
-            # 5. Generate Internal Tokens 
             token_payload = {"sub": str(user.id)}
             access_token = jwt_utils.create_access_token(token_payload)
             refresh_token = jwt_utils.create_refresh_token(token_payload)
@@ -131,3 +129,35 @@ class AuthService:
                 "refresh_token": refresh_token,
                 "expires_in": settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60
             }
+        
+    @staticmethod
+    async def refresh_access_token(refresh_token: str, user_repo: UserRepository):
+        try:
+
+            payload = jwt.decode(
+                refresh_token, 
+                settings.JWT_SECRET, 
+                algorithms=[settings.ALGORITHM]
+            )
+            user_id = payload.get("sub")
+            token_type = payload.get("type")
+            
+            if user_id is None or token_type != "refresh":
+                raise InvalidRefreshTokenException()
+                
+            user_id_uuid = uuid.UUID(user_id)
+                
+        except (JWTError, ValueError):
+            raise InvalidRefreshTokenException()
+
+        user = await user_repo.get_by_id(user_id_uuid)
+        if not user:
+            raise InvalidRefreshTokenException()
+
+        token_payload = {"sub": str(user.id)}
+        new_access_token = jwt_utils.create_access_token(token_payload)
+
+        return {
+            "access_token": new_access_token,
+            "expires_in": settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60
+        }
