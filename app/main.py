@@ -5,6 +5,7 @@ from app.core.database import engine, redis_client
 from app.middlewares.cors import setup_cors
 from app.exceptions.setup import setup_exception_handlers
 from app.api.v1 import auth, tasks
+import app.models
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

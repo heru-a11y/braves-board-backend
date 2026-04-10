@@ -2,8 +2,8 @@ import uuid
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.repositories.task_repository import TaskRepository
 from app.repositories.column_repository import ColumnRepository
-from app.schemas.task import TaskCreateRequest, TaskCreate
-from app.exceptions.task_exceptions import ColumnNotFoundException
+from app.schemas.task import TaskCreateRequest, TaskCreate, TaskDetailResponse
+from app.exceptions.task_exceptions import ColumnNotFoundException, TaskNotFoundException
 
 class TaskService:
     @staticmethod
@@ -51,3 +51,12 @@ class TaskService:
             for task, comment_count, attachment_count in records
         ]
     
+    @staticmethod
+    async def get_task_detail(db: AsyncSession, task_id: uuid.UUID):
+        task_repo = TaskRepository(db)
+        task = await task_repo.get_detail_by_id(task_id)
+        
+        if not task:
+            raise TaskNotFoundException()
+
+        return TaskDetailResponse.model_validate(task).model_dump(mode='json')

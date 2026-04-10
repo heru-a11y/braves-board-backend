@@ -1,6 +1,7 @@
 import uuid
 from datetime import datetime, timezone
 from typing import Sequence
+from sqlalchemy.orm import selectinload
 from sqlalchemy import select, update, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.task import Task
@@ -65,3 +66,16 @@ class TaskRepository:
         result = await self.session.execute(stmt)
         await self.session.commit()
         return result.rowcount > 0
+    
+    async def get_detail_by_id(self, task_id: uuid.UUID) -> Task | None:
+        stmt = (
+            select(Task)
+            .options(
+                selectinload(Task.subtasks),
+                selectinload(Task.comments),
+                selectinload(Task.attachments)
+            )
+            .where(Task.id == task_id, Task.deleted_at.is_(None))
+        )
+        result = await self.session.execute(stmt)
+        return result.scalar_one_or_none()

@@ -46,4 +46,10 @@ class TaskListResponse(BaseModel):
     attachment_count: int
     is_timer_running: bool
 
-    
+class TaskDetailResponse(TaskBase):
+    id: uuid.UUID
+    subtasks: List[SubtaskResponse] = []
+    comments: List[TaskCommentResponse] = []
+    attachments: List[TaskAttachmentResponse] = []
+
+    model_config = ConfigDict(from_attributes=True)
