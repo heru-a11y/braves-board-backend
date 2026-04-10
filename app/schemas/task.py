@@ -53,3 +53,13 @@ class TaskDetailResponse(TaskBase):
     attachments: List[TaskAttachmentResponse] = []
 
     model_config = ConfigDict(from_attributes=True)
+
+class TaskUpdateRequest(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    due_date: Optional[datetime] = None
+    labels: Optional[List[str]] = None
+    assignee_ids: Optional[List[uuid.UUID]] = None
+
+class TaskMoveRequest(BaseModel):
+    column_id: uuid.UUID

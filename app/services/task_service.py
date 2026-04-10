@@ -1,9 +1,10 @@
+# type: ignore
 import uuid
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.repositories.task_repository import TaskRepository
 from app.repositories.column_repository import ColumnRepository
-from app.schemas.task import TaskCreateRequest, TaskCreate, TaskDetailResponse
-from app.exceptions.task_exceptions import ColumnNotFoundException, TaskNotFoundException
+from app.schemas.task import TaskCreateRequest, TaskCreate, TaskDetailResponse, TaskUpdateRequest, TaskMoveRequest
+from app.exceptions.task_exceptions import ColumnNotFoundException, TaskNotFoundException, InvalidTargetColumnException
 
 class TaskService:
     @staticmethod
@@ -60,3 +61,49 @@ class TaskService:
             raise TaskNotFoundException()
 
         return TaskDetailResponse.model_validate(task).model_dump(mode='json')
+    
+    @staticmethod
+    async def update_task(db: AsyncSession, task_id: uuid.UUID, request: TaskUpdateRequest):
+        task_repo = TaskRepository(db)
+        update_data = request.model_dump(exclude_unset=True)
+        
+        updated_task = await task_repo.update(task_id, update_data)
+        
+        if not updated_task:
+            raise TaskNotFoundException()
+
+        return {
+            "id": updated_task.id,
+            "updated_at": updated_task.updated_at
+        }
+    
+    @staticmethod
+    async def move_task(db: AsyncSession, task_id: uuid.UUID, request: TaskMoveRequest):
+        task_repo = TaskRepository(db)
+        column_repo = ColumnRepository(db)
+        
+        # Cek ketersediaan task
+        task = await task_repo.get_by_id(task_id)
+        if not task:
+            raise TaskNotFoundException()
+
+        # Cek validitas kolom tujuan
+        target_column = await column_repo.get_by_id(request.column_id)
+        if not target_column:
+            raise InvalidTargetColumnException()
+
+        # Ambil tugas yang sudah ada di kolom tujuan untuk menentukan posisi baru
+        existing_tasks = await task_repo.get_all_by_column_id(request.column_id)
+        new_position = len(existing_tasks) + 1
+
+        update_data = {
+            "column_id": request.column_id,
+            "position": new_position
+        }
+        
+        updated_task = await task_repo.update(task_id, update_data)
+
+        return {
+            "id": updated_task.id,
+            "column_id": updated_task.column_id
+        }
