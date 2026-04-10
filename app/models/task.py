@@ -1,8 +1,14 @@
 import uuid
+from typing import TYPE_CHECKING
 from sqlalchemy import String, Text, Integer, Boolean, DateTime, func, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID, ARRAY
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.core.database import Base
+
+if TYPE_CHECKING:
+    from app.models.subtask import Subtask
+    from app.models.task_comment import TaskComment
+    from app.models.task_attachment import TaskAttachment
 
 class Task(Base):
     __tablename__ = "tasks"
@@ -19,3 +25,7 @@ class Task(Base):
     created_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
     deleted_at: Mapped[DateTime | None] = mapped_column(DateTime(timezone=True), index=True, nullable=True)
+
+    subtasks: Mapped[list["Subtask"]] = relationship(back_populates="task")
+    comments: Mapped[list["TaskComment"]] = relationship(back_populates="task")
+    attachments: Mapped[list["TaskAttachment"]] = relationship(back_populates="task")
