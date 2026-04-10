@@ -1,9 +1,11 @@
 import uuid
 from datetime import datetime, timezone
 from typing import Sequence
-from sqlalchemy import select, update
+from sqlalchemy import select, update, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.task import Task
+from app.models.task_comment import TaskComment
+from app.models.task_attachment import TaskAttachment
 from app.schemas.task import TaskCreate
 
 class TaskRepository:
@@ -19,6 +21,22 @@ class TaskRepository:
         stmt = select(Task).where(Task.column_id == column_id, Task.deleted_at.is_(None)).order_by(Task.position)
         result = await self.session.execute(stmt)
         return result.scalars().all()
+
+    async def get_all_by_column_id_with_counts(self, column_id: uuid.UUID):
+        stmt = (
+            select(
+                Task,
+                func.count(TaskComment.id.distinct()).label("comment_count"),
+                func.count(TaskAttachment.id.distinct()).label("attachment_count")
+            )
+            .outerjoin(TaskComment, (TaskComment.task_id == Task.id) & (TaskComment.deleted_at.is_(None)))
+            .outerjoin(TaskAttachment, TaskAttachment.task_id == Task.id)
+            .where(Task.column_id == column_id, Task.deleted_at.is_(None))
+            .group_by(Task.id)
+            .order_by(Task.position)
+        )
+        result = await self.session.execute(stmt)
+        return result.all()
 
     async def create(self, task_in: TaskCreate) -> Task:
         db_task = Task(**task_in.model_dump())

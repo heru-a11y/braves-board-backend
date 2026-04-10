@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 from app.core.database import engine, redis_client
 from app.middlewares.cors import setup_cors
 from app.exceptions.setup import setup_exception_handlers
-from app.api.v1 import auth
+from app.api.v1 import auth, tasks
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -22,3 +22,4 @@ setup_cors(app)
 setup_exception_handlers(app)
 
 app.include_router(auth.router)
+app.include_router(tasks.router)
