@@ -7,6 +7,7 @@ from app.api.dependencies.auth import get_current_user
 from app.models.user import User
 from app.services.subtask_service import SubtaskService
 from app.schemas.subtask import SubtaskCreateRequest, SubtaskUpdateRequest, SubtaskMoveRequest
+from app.constants import subtask_messages
 
 router = APIRouter(prefix="/api/v1", tags=["Subtasks"])
 
@@ -54,3 +55,17 @@ async def move_subtask(
     service = SubtaskService(db)
     subtask = await service.move_subtask(subtask_id, payload)
     return {"data": subtask}
+
+@router.delete(
+    "/subtasks/{subtask_id}",
+    status_code=status.HTTP_200_OK,
+    response_model=dict
+)
+async def delete_subtask(
+    subtask_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    service = SubtaskService(db)
+    await service.delete_subtask(subtask_id)
+    return {"data": {"message": subtask_messages.SUBTASK_DELETED_SUCCESS}}

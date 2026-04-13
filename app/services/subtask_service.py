@@ -102,3 +102,23 @@ class SubtaskService:
         )
 
         return SubtaskMoveResponse.model_validate(updated_subtask)
+    
+    async def delete_subtask(self, subtask_id: uuid.UUID) -> None:
+        subtask = await self.subtask_repo.get_by_id(subtask_id)
+        if not subtask:
+            raise SubtaskNotFoundException()
+ 
+        deleted_position = subtask.position
+        task_id = subtask.task_id
+ 
+        await self.subtask_repo.soft_delete(subtask_id)
+ 
+        # Rapikan posisi: geser semua subtask di bawah posisi yang dihapus naik -1
+        max_position = await self.subtask_repo.get_max_position(task_id)
+        if deleted_position <= max_position:
+            await self.subtask_repo.shift_positions(
+                task_id=task_id,
+                from_position=deleted_position + 1,
+                to_position=max_position + 1,  # +1 karena max sudah dihitung tanpa yang dihapus
+                shift=-1
+            )

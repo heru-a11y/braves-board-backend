@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.task import Task
 from app.models.task_comment import TaskComment
 from app.models.task_attachment import TaskAttachment
+from app.models.subtask import Subtask
 from app.schemas.task import TaskCreate
 
 class TaskRepository:
@@ -66,12 +67,12 @@ class TaskRepository:
         result = await self.session.execute(stmt)
         await self.session.commit()
         return result.rowcount > 0
-    
+
     async def get_detail_by_id(self, task_id: uuid.UUID) -> Task | None:
         stmt = (
             select(Task)
             .options(
-                selectinload(Task.subtasks),
+                selectinload(Task.subtasks.and_(Subtask.deleted_at.is_(None))),
                 selectinload(Task.comments),
                 selectinload(Task.attachments)
             )
