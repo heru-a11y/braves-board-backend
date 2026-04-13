@@ -67,3 +67,14 @@ async def move_task(
     return {
         "data": result
     }
+
+@router.delete("/{id}", response_model=dict)
+async def delete_task(
+    id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user = Depends(get_current_user)
+):
+    result = await TaskService.delete_task(db, id)
+    return {
+        "data": result
+    }

@@ -5,6 +5,7 @@ from app.repositories.task_repository import TaskRepository
 from app.repositories.column_repository import ColumnRepository
 from app.schemas.task import TaskCreateRequest, TaskCreate, TaskDetailResponse, TaskUpdateRequest, TaskMoveRequest
 from app.exceptions.task_exceptions import ColumnNotFoundException, TaskNotFoundException, InvalidTargetColumnException
+from app.constants import task_messages
 
 class TaskService:
     @staticmethod
@@ -82,17 +83,14 @@ class TaskService:
         task_repo = TaskRepository(db)
         column_repo = ColumnRepository(db)
         
-        # Cek ketersediaan task
         task = await task_repo.get_by_id(task_id)
         if not task:
             raise TaskNotFoundException()
 
-        # Cek validitas kolom tujuan
         target_column = await column_repo.get_by_id(request.column_id)
         if not target_column:
             raise InvalidTargetColumnException()
 
-        # Ambil tugas yang sudah ada di kolom tujuan untuk menentukan posisi baru
         existing_tasks = await task_repo.get_all_by_column_id(request.column_id)
         new_position = len(existing_tasks) + 1
 
@@ -106,4 +104,16 @@ class TaskService:
         return {
             "id": updated_task.id,
             "column_id": updated_task.column_id
+        }
+    
+    @staticmethod
+    async def delete_task(db: AsyncSession, task_id: uuid.UUID):
+        task_repo = TaskRepository(db)
+        is_deleted = await task_repo.soft_delete(task_id)
+        
+        if not is_deleted:
+            raise TaskNotFoundException()
+
+        return {
+            "message": task_messages.TASK_DELETED_SUCCESS
         }
