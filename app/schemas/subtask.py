@@ -14,6 +14,10 @@ class SubtaskCreateRequest(BaseModel):
 class SubtaskCreate(SubtaskBase):
     task_id: uuid.UUID
 
+class SubtaskUpdateRequest(BaseModel):
+    title: Optional[str] = None
+    is_completed: Optional[bool] = None
+
 class SubtaskResponse(SubtaskBase):
     id: uuid.UUID
     task_id: uuid.UUID
@@ -28,5 +32,13 @@ class SubtaskSimpleResponse(BaseModel):
     title: str
     is_completed: bool
     position: int
+
+    model_config = ConfigDict(from_attributes=True)
+
+class SubtaskUpdateResponse(BaseModel):
+    id: uuid.UUID
+    title: str
+    is_completed: bool
+    updated_at: datetime
 
     model_config = ConfigDict(from_attributes=True)

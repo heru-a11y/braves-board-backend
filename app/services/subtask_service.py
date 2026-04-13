@@ -3,8 +3,18 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.repositories.subtask_repository import SubtaskRepository
 from app.repositories.task_repository import TaskRepository
-from app.schemas.subtask import SubtaskCreateRequest, SubtaskCreate, SubtaskSimpleResponse
+from app.schemas.subtask import (
+    SubtaskCreateRequest,
+    SubtaskCreate,
+    SubtaskSimpleResponse,
+    SubtaskUpdateRequest,
+    SubtaskUpdateResponse,
+)
 from app.exceptions.task_exceptions import TaskNotFoundException
+from app.exceptions.subtask_exceptions import (
+    SubtaskNotFoundException,
+    NoSubtaskFieldsToUpdateException,
+)
 
 class SubtaskService:
     def __init__(self, db: AsyncSession):
@@ -31,3 +41,20 @@ class SubtaskService:
         subtask = await self.subtask_repo.create(subtask_in)
 
         return SubtaskSimpleResponse.model_validate(subtask)
+
+    async def update_subtask(
+        self,
+        subtask_id: uuid.UUID,
+        payload: SubtaskUpdateRequest
+    ) -> SubtaskUpdateResponse:
+        update_data = payload.model_dump(exclude_unset=True)
+        if not update_data:
+            raise NoSubtaskFieldsToUpdateException()
+
+        subtask = await self.subtask_repo.get_by_id(subtask_id)
+        if not subtask:
+            raise SubtaskNotFoundException()
+
+        updated_subtask = await self.subtask_repo.update(subtask_id, update_data)
+
+        return SubtaskUpdateResponse.model_validate(updated_subtask)
