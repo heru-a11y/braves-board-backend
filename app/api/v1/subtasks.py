@@ -1,0 +1,26 @@
+import uuid
+from fastapi import APIRouter, Depends, status
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.core.database import get_db
+from app.api.dependencies.auth import get_current_user
+from app.models.user import User
+from app.services.subtask_service import SubtaskService
+from app.schemas.subtask import SubtaskCreateRequest
+
+router = APIRouter(prefix="/api/v1/tasks", tags=["Subtasks"])
+
+@router.post(
+    "/{task_id}/subtasks",
+    status_code=status.HTTP_201_CREATED,
+    response_model=dict
+)
+async def create_subtask(
+    task_id: uuid.UUID,
+    payload: SubtaskCreateRequest,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    service = SubtaskService(db)
+    subtask = await service.create_subtask(task_id, payload)
+    return {"data": subtask}
