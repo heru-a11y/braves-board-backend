@@ -51,6 +51,32 @@ class SubtaskRepository:
         await self.session.commit()
         return result.scalar_one_or_none()
 
+    async def shift_positions(
+        self,
+        task_id: uuid.UUID,
+        from_position: int,
+        to_position: int,
+        shift: int
+    ) -> None:
+        """
+        Geser posisi subtask lain dalam rentang [from_position, to_position]
+        shift: +1 (turun) atau -1 (naik)
+        """
+        stmt = (
+            update(Subtask)
+            .where(
+                Subtask.task_id == task_id,
+                Subtask.deleted_at.is_(None),
+                Subtask.position >= from_position,
+                Subtask.position <= to_position,
+            )
+            .values(
+                position=Subtask.position + shift,
+                updated_at=datetime.now(timezone.utc)
+            )
+        )
+        await self.session.execute(stmt)
+
     async def soft_delete(self, subtask_id: uuid.UUID) -> bool:
         stmt = (
             update(Subtask)

@@ -15,3 +15,10 @@ class NoSubtaskFieldsToUpdateException(CustomException):
             status_code=status.HTTP_400_BAD_REQUEST,
             message=subtask_messages.SUBTASK_NO_FIELDS_TO_UPDATE
         )
+
+class InvalidSubtaskPositionException(CustomException):
+    def __init__(self):
+        super().__init__(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            message=subtask_messages.SUBTASK_INVALID_POSITION
+        )

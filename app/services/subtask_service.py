@@ -9,11 +9,14 @@ from app.schemas.subtask import (
     SubtaskSimpleResponse,
     SubtaskUpdateRequest,
     SubtaskUpdateResponse,
+    SubtaskMoveRequest,
+    SubtaskMoveResponse,
 )
 from app.exceptions.task_exceptions import TaskNotFoundException
 from app.exceptions.subtask_exceptions import (
     SubtaskNotFoundException,
     NoSubtaskFieldsToUpdateException,
+    InvalidSubtaskPositionException,
 )
 
 class SubtaskService:
@@ -58,3 +61,44 @@ class SubtaskService:
         updated_subtask = await self.subtask_repo.update(subtask_id, update_data)
 
         return SubtaskUpdateResponse.model_validate(updated_subtask)
+
+    async def move_subtask(
+        self,
+        subtask_id: uuid.UUID,
+        payload: SubtaskMoveRequest
+    ) -> SubtaskMoveResponse:
+        subtask = await self.subtask_repo.get_by_id(subtask_id)
+        if not subtask:
+            raise SubtaskNotFoundException()
+
+        max_position = await self.subtask_repo.get_max_position(subtask.task_id)
+        new_position = payload.position
+        old_position = subtask.position
+
+        # Validasi: posisi harus dalam range yang valid dan tidak sama
+        if new_position < 1 or new_position > max_position or new_position == old_position:
+            raise InvalidSubtaskPositionException()
+
+        if new_position < old_position:
+            # Subtask naik ke atas: geser subtask di antara [new_pos, old_pos-1] turun +1
+            await self.subtask_repo.shift_positions(
+                task_id=subtask.task_id,
+                from_position=new_position,
+                to_position=old_position - 1,
+                shift=+1
+            )
+        else:
+            # Subtask turun ke bawah: geser subtask di antara [old_pos+1, new_pos] naik -1
+            await self.subtask_repo.shift_positions(
+                task_id=subtask.task_id,
+                from_position=old_position + 1,
+                to_position=new_position,
+                shift=-1
+            )
+
+        # Set posisi baru untuk subtask yang dipindah
+        updated_subtask = await self.subtask_repo.update(
+            subtask_id, {"position": new_position}
+        )
+
+        return SubtaskMoveResponse.model_validate(updated_subtask)
