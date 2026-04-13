@@ -22,3 +22,10 @@ class InvalidTargetColumnException(CustomException):
             status_code=status.HTTP_400_BAD_REQUEST,
             message=task_messages.INVALID_TARGET_COLUMN
         )
+
+class InvalidTaskPositionException(CustomException):
+    def __init__(self):
+        super().__init__(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            message=task_messages.TASK_INVALID_POSITION
+        )

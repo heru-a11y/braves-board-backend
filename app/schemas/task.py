@@ -39,6 +39,7 @@ class TaskCreateRequest(BaseModel):
 class TaskListResponse(BaseModel):
     id: uuid.UUID
     title: str
+    position: int
     due_date: Optional[datetime] = None
     labels: Optional[List[str]] = None
     assignee_ids: Optional[List[uuid.UUID]] = None
@@ -63,3 +64,21 @@ class TaskUpdateRequest(BaseModel):
 
 class TaskMoveRequest(BaseModel):
     column_id: uuid.UUID
+    position: int
+
+class TaskMoveResponse(BaseModel):
+    id: uuid.UUID
+    column_id: uuid.UUID
+    position: int
+
+    model_config = ConfigDict(from_attributes=True)
+
+class TaskReorderRequest(BaseModel):
+    position: int
+
+class TaskReorderResponse(BaseModel):
+    id: uuid.UUID
+    position: int
+    updated_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)

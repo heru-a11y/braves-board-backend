@@ -40,6 +40,37 @@ class TaskRepository:
         result = await self.session.execute(stmt)
         return result.all()
 
+    async def get_max_position(self, column_id: uuid.UUID) -> int:
+        stmt = select(func.max(Task.position)).where(
+            Task.column_id == column_id,
+            Task.deleted_at.is_(None)
+        )
+        result = await self.session.execute(stmt)
+        max_pos = result.scalar()
+        return max_pos if max_pos is not None else 0
+
+    async def shift_positions(
+        self,
+        column_id: uuid.UUID,
+        from_position: int,
+        to_position: int,
+        shift: int
+    ) -> None:
+        stmt = (
+            update(Task)
+            .where(
+                Task.column_id == column_id,
+                Task.deleted_at.is_(None),
+                Task.position >= from_position,
+                Task.position <= to_position,
+            )
+            .values(
+                position=Task.position + shift,
+                updated_at=datetime.now(timezone.utc)
+            )
+        )
+        await self.session.execute(stmt)
+
     async def create(self, task_in: TaskCreate) -> Task:
         db_task = Task(**task_in.model_dump())
         self.session.add(db_task)
