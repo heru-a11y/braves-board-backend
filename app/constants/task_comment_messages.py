@@ -1,0 +1,5 @@
+TASK_NOT_FOUND = "Tugas tidak ditemukan"
+COMMENT_NOT_FOUND = "Komentar tidak ditemukan"
+COMMENT_CREATED_SUCCESS = "Komentar berhasil ditambahkan"
+COMMENT_DELETED_SUCCESS = "Komentar berhasil dihapus"
+COMMENT_FORBIDDEN = "Anda tidak memiliki akses untuk mengubah komentar ini"
