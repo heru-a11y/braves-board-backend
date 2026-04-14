@@ -9,6 +9,8 @@ from app.schemas.subtask import (
     SubtaskSimpleResponse,
     SubtaskUpdateRequest,
     SubtaskUpdateResponse,
+    SubtaskCompleteRequest,
+    SubtaskCompleteResponse,
     SubtaskMoveRequest,
     SubtaskMoveResponse,
 )
@@ -17,6 +19,7 @@ from app.exceptions.subtask_exceptions import (
     SubtaskNotFoundException,
     NoSubtaskFieldsToUpdateException,
     InvalidSubtaskPositionException,
+    InvalidSubtaskStatusException,
 )
 
 class SubtaskService:
@@ -62,6 +65,24 @@ class SubtaskService:
 
         return SubtaskUpdateResponse.model_validate(updated_subtask)
 
+    async def complete_subtask(
+        self,
+        subtask_id: uuid.UUID,
+        payload: SubtaskCompleteRequest
+    ) -> SubtaskCompleteResponse:
+        if not isinstance(payload.is_completed, bool):
+            raise InvalidSubtaskStatusException()
+
+        subtask = await self.subtask_repo.get_by_id(subtask_id)
+        if not subtask:
+            raise SubtaskNotFoundException()
+
+        updated_subtask = await self.subtask_repo.update(
+            subtask_id, {"is_completed": payload.is_completed}
+        )
+
+        return SubtaskCompleteResponse.model_validate(updated_subtask)
+
     async def move_subtask(
         self,
         subtask_id: uuid.UUID,
@@ -75,12 +96,10 @@ class SubtaskService:
         new_position = payload.position
         old_position = subtask.position
 
-        # Validasi: posisi harus dalam range yang valid dan tidak sama
         if new_position < 1 or new_position > max_position or new_position == old_position:
             raise InvalidSubtaskPositionException()
 
         if new_position < old_position:
-            # Subtask naik ke atas: geser subtask di antara [new_pos, old_pos-1] turun +1
             await self.subtask_repo.shift_positions(
                 task_id=subtask.task_id,
                 from_position=new_position,
@@ -88,7 +107,6 @@ class SubtaskService:
                 shift=+1
             )
         else:
-            # Subtask turun ke bawah: geser subtask di antara [old_pos+1, new_pos] naik -1
             await self.subtask_repo.shift_positions(
                 task_id=subtask.task_id,
                 from_position=old_position + 1,
@@ -96,29 +114,27 @@ class SubtaskService:
                 shift=-1
             )
 
-        # Set posisi baru untuk subtask yang dipindah
         updated_subtask = await self.subtask_repo.update(
             subtask_id, {"position": new_position}
         )
 
         return SubtaskMoveResponse.model_validate(updated_subtask)
-    
+
     async def delete_subtask(self, subtask_id: uuid.UUID) -> None:
         subtask = await self.subtask_repo.get_by_id(subtask_id)
         if not subtask:
             raise SubtaskNotFoundException()
- 
+
         deleted_position = subtask.position
         task_id = subtask.task_id
- 
+
         await self.subtask_repo.soft_delete(subtask_id)
- 
-        # Rapikan posisi: geser semua subtask di bawah posisi yang dihapus naik -1
+
         max_position = await self.subtask_repo.get_max_position(task_id)
         if deleted_position <= max_position:
             await self.subtask_repo.shift_positions(
                 task_id=task_id,
                 from_position=deleted_position + 1,
-                to_position=max_position + 1,  # +1 karena max sudah dihitung tanpa yang dihapus
+                to_position=max_position + 1,
                 shift=-1
             )

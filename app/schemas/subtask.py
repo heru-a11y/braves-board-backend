@@ -16,7 +16,23 @@ class SubtaskCreate(SubtaskBase):
 
 class SubtaskUpdateRequest(BaseModel):
     title: Optional[str] = None
-    is_completed: Optional[bool] = None
+
+class SubtaskUpdateResponse(BaseModel):
+    id: uuid.UUID
+    title: str
+    updated_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+class SubtaskCompleteRequest(BaseModel):
+    is_completed: bool
+
+class SubtaskCompleteResponse(BaseModel):
+    id: uuid.UUID
+    is_completed: bool
+    updated_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
 
 class SubtaskMoveRequest(BaseModel):
     position: int
@@ -35,14 +51,6 @@ class SubtaskSimpleResponse(BaseModel):
     title: str
     is_completed: bool
     position: int
-
-    model_config = ConfigDict(from_attributes=True)
-
-class SubtaskUpdateResponse(BaseModel):
-    id: uuid.UUID
-    title: str
-    is_completed: bool
-    updated_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
 
