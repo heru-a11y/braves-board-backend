@@ -5,14 +5,18 @@ from pydantic import BaseModel, ConfigDict
 
 class ColumnBase(BaseModel):
     title: str
-    position: int
 
 class ColumnCreate(ColumnBase):
     board_id: uuid.UUID
 
+class ColumnUpdate(BaseModel):
+    title: Optional[str] = None
+    position: Optional[int] = None
+
 class ColumnResponse(ColumnBase):
     id: uuid.UUID
     board_id: uuid.UUID
+    position: int
     created_at: datetime
     updated_at: datetime
     deleted_at: Optional[datetime] = None
