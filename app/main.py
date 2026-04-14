@@ -4,16 +4,14 @@ from contextlib import asynccontextmanager
 from app.core.database import engine, redis_client
 from app.middlewares.cors import setup_cors
 from app.exceptions.setup import setup_exception_handlers
-from app.api.v1 import auth, board, column, tasks, subtasks, task_comments
+from app.api.v1 import auth, board, column, tasks, subtasks, task_comments, task_attachments
 import app.models
-
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     yield
     await engine.dispose()
     await redis_client.close()
-
 
 app = FastAPI(
     title="Braves Board API",
@@ -30,3 +28,4 @@ app.include_router(column.router)
 app.include_router(tasks.router)
 app.include_router(subtasks.router)
 app.include_router(task_comments.router)
+app.include_router(task_attachments.router)

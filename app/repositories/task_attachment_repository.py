@@ -2,8 +2,8 @@ import uuid
 from typing import Sequence
 from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.models.task_attachment import TaskAttachment
-from app.schemas.task_attachment import TaskAttachmentCreate
+from app.models.task_attachment_model import TaskAttachment
+from app.schemas.task_attachment_schemas import TaskAttachmentCreate
 
 class TaskAttachmentRepository:
     def __init__(self, session: AsyncSession):

@@ -1,0 +1,4 @@
+INVALID_FILE_TYPE = "Invalid file type. Only JPG, PNG, WEBP, PDF, and MP4 are allowed."
+FILE_TOO_LARGE_IMAGE = "Image file size exceeds the 10MB limit."
+FILE_TOO_LARGE_PDF = "PDF file size exceeds the 50MB limit."
+FILE_TOO_LARGE_VIDEO = "Video file size exceeds the 1000MB limit."
