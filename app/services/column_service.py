@@ -2,7 +2,7 @@ import uuid
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.schemas.column import ColumnCreate
+from app.schemas.column_schemas import ColumnCreate
 from app.constants.column_messages import SuccessMessage, ErrorMessage
 from app.repositories.column_repository import ColumnRepository
 

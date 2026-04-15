@@ -1,3 +1,4 @@
+# type: ignore
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
@@ -22,6 +23,9 @@ class Settings(BaseSettings):
     
     FRONTEND_URL: str
 
+    GCS_BUCKET_NAME: str
+    GOOGLE_APPLICATION_CREDENTIALS: str
+
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
-settings = Settings()
+settings = Settings() 

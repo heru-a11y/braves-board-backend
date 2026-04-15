@@ -6,9 +6,9 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.core.database import Base
 
 if TYPE_CHECKING:
-    from app.models.subtask import Subtask
-    from app.models.task_comment import TaskComment
-    from app.models.task_attachment import TaskAttachment
+    from app.models.subtask_model import Subtask
+    from app.models.task_comment_model import TaskComment
+    from app.models.task_attachment_model import TaskAttachment
 
 class Task(Base):
     __tablename__ = "tasks"

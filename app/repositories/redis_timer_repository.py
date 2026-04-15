@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from typing import Mapping, Any
 from redis.asyncio.client import Redis
-from app.schemas.redis_timer import ActiveTimerRedis
+from app.schemas.redis_timer_schemas import ActiveTimerRedis
 
 class RedisTimerRepository:
     def __init__(self, redis_client: Redis):

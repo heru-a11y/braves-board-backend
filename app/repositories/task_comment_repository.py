@@ -3,8 +3,8 @@ from datetime import datetime, timezone
 from typing import Sequence
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.models.task_comment import TaskComment
-from app.schemas.task_comment import TaskCommentCreate
+from app.models.task_comment_model import TaskComment
+from app.schemas.task_comment_schemas import TaskCommentCreate
 
 class TaskCommentRepository:
     def __init__(self, session: AsyncSession):

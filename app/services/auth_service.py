@@ -4,7 +4,7 @@ import uuid
 from jose import jwt, JWTError
 from app.core.config import settings
 from app.repositories.user_repository import UserRepository
-from app.schemas.user import UserCreate
+from app.schemas.user_schemas import UserCreate
 from app.utils import jwt_utils
 from app.exceptions.auth_exceptions import (
     GoogleAuthException, 

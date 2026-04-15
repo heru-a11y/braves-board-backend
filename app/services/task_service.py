@@ -3,7 +3,7 @@ import uuid
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.repositories.task_repository import TaskRepository
 from app.repositories.column_repository import ColumnRepository
-from app.schemas.task import (
+from app.schemas.task_schemas import (
     TaskCreateRequest, TaskCreate, TaskDetailResponse,
     TaskUpdateRequest, TaskMoveRequest, TaskMoveResponse,
     TaskReorderRequest, TaskReorderResponse,
@@ -194,6 +194,8 @@ class TaskService:
 
         if not is_deleted:
             raise TaskNotFoundException()
+
+        await task_repo.cascade_soft_delete_subtasks(task_id)
 
         return {
             "message": task_messages.TASK_DELETED_SUCCESS

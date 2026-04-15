@@ -8,7 +8,7 @@ from jose import jwt
 from app.core.config import settings
 from app.core.database import get_db, redis_client
 from app.repositories.user_repository import UserRepository
-from app.schemas.auth import (
+from app.schemas.auth_schemas import (
     AuthUrlResponse, 
     AuthCallbackRequest, 
     TokenResponse, 
@@ -18,7 +18,7 @@ from app.schemas.auth import (
 )
 from app.services.auth_service import AuthService
 from app.api.dependencies.auth import get_current_user, security
-from app.models.user import User
+from app.models.user_model import User
 from app.exceptions.auth_exceptions import InvalidRefreshTokenException
 from app.constants import auth_messages
 

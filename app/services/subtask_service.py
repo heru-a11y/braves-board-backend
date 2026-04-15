@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.repositories.subtask_repository import SubtaskRepository
 from app.repositories.task_repository import TaskRepository
-from app.schemas.subtask import (
+from app.schemas.subtask_schemas import (
     SubtaskCreateRequest,
     SubtaskCreate,
     SubtaskSimpleResponse,

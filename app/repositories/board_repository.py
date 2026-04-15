@@ -3,8 +3,8 @@ from datetime import datetime, timezone
 from typing import Sequence
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.models.board import Board
-from app.schemas.board import BoardCreate
+from app.models.board_model import Board
+from app.schemas.board_schemas import BoardCreate
 
 
 class BoardRepository:

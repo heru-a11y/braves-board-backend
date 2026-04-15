@@ -2,8 +2,8 @@ import uuid
 from typing import Sequence
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.models.time_log import TimeLog
-from app.schemas.time_log import TimeLogCreate
+from app.models.time_log_model import TimeLog
+from app.schemas.time_log_schemas import TimeLogCreate
 
 class TimeLogRepository:
     def __init__(self, session: AsyncSession):

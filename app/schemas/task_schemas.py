@@ -3,9 +3,9 @@ from datetime import datetime
 from typing import Optional, List
 from pydantic import BaseModel, ConfigDict
 
-from app.schemas.subtask import SubtaskResponse
-from app.schemas.task_comment import TaskCommentResponse
-from app.schemas.task_attachment import TaskAttachmentResponse
+from app.schemas.subtask_schemas import SubtaskResponse
+from app.schemas.task_comment_schemas import TaskCommentResponse
+from app.schemas.task_attachment_schemas import TaskAttachmentResponse
 
 class TaskBase(BaseModel):
     title: str

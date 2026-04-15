@@ -1,10 +1,11 @@
+# type: ignore
 import uuid
 from datetime import datetime, timezone
 from typing import Sequence
 from sqlalchemy import select, update, func
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.models.column import Column
-from app.schemas.column import ColumnCreate
+from app.models.column_model import Column
+from app.schemas.column_schemas import ColumnCreate
 
 
 class ColumnRepository:
@@ -198,7 +199,7 @@ class ColumnRepository:
         await self.session.flush()
 
         target = columns.pop(old_index)
-        columns.insert(new_position - 1, target)
+        columns.insert(new_position - 1, target) 
 
         for i, col in enumerate(columns, start=1):
             await self.session.execute(
