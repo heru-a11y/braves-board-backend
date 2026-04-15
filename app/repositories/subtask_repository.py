@@ -3,8 +3,8 @@ from datetime import datetime, timezone
 from typing import Sequence
 from sqlalchemy import select, update, func
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.models.subtask import Subtask
-from app.schemas.subtask import SubtaskCreate
+from app.models.subtask_model import Subtask
+from app.schemas.subtask_schemas import SubtaskCreate
 
 class SubtaskRepository:
     def __init__(self, session: AsyncSession):

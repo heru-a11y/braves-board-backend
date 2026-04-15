@@ -34,18 +34,16 @@ async def add_comment(
 
 
 @router.delete(
-    "/{id}/comments/{comment_id}",
+    "/comments/{comment_id}",
     response_model=dict,
 )
 async def delete_comment(
-    id: uuid.UUID,
     comment_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
     current_user=Depends(get_current_user),
 ):
     result = await TaskCommentService.delete_comment(
         db=db,
-        task_id=id,
         comment_id=comment_id,
         current_user_id=current_user.id,
     )

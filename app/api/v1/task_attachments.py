@@ -16,7 +16,7 @@ async def upload_task_attachment(
     db: AsyncSession = Depends(get_db),
     current_user = Depends(get_current_user)
 ):
-    repository = TaskAttachmentRepository(db)
+    repository = TaskAttachmentRepository(db)~
     service = TaskAttachmentService(repository)
     attachment = await service.upload_file(task_id, file)
     

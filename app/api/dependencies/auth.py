@@ -8,7 +8,7 @@ from app.core.config import settings
 from app.core.database import get_db, redis_client
 from app.repositories.user_repository import UserRepository
 from app.exceptions.auth_exceptions import InvalidTokenException, TokenExpiredException
-from app.models.user import User
+from app.models.user_model import User
 
 security = HTTPBearer(auto_error=False)
 

@@ -3,8 +3,8 @@ from datetime import datetime, timezone
 from typing import Sequence
 from sqlalchemy import select, update, func
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.models.column import Column
-from app.schemas.column import ColumnCreate
+from app.models.column_model import Column
+from app.schemas.column_schemas import ColumnCreate
 
 
 class ColumnRepository:

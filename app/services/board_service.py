@@ -1,7 +1,7 @@
 import uuid
 from fastapi import HTTPException, status
 from app.core.redis import redis_client
-from app.schemas.board import BoardCreate
+from app.schemas.board_schemas import BoardCreate
 from app.constants.board_messages import BoardMessage, BoardResponseMessage
 from app.repositories.board_repository import BoardRepository
 from datetime import datetime, timezone

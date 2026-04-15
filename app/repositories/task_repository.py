@@ -4,11 +4,11 @@ from typing import Sequence
 from sqlalchemy.orm import selectinload
 from sqlalchemy import select, update, func
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.models.task import Task
-from app.models.task_comment import TaskComment
-from app.models.task_attachment import TaskAttachment
-from app.models.subtask import Subtask
-from app.schemas.task import TaskCreate
+from app.models.task_model import Task
+from app.models.task_comment_model import TaskComment
+from app.models.task_attachment_model import TaskAttachment
+from app.models.subtask_model import Subtask
+from app.schemas.task_schemas import TaskCreate
 
 class TaskRepository:
     def __init__(self, session: AsyncSession):
@@ -99,12 +99,21 @@ class TaskRepository:
         await self.session.commit()
         return result.rowcount > 0
 
+    async def cascade_soft_delete_subtasks(self, task_id: uuid.UUID) -> None:
+        stmt = (
+            update(Subtask)
+            .where(Subtask.task_id == task_id, Subtask.deleted_at.is_(None))
+            .values(deleted_at=datetime.now(timezone.utc))
+        )
+        await self.session.execute(stmt)
+        await self.session.commit()
+
     async def get_detail_by_id(self, task_id: uuid.UUID) -> Task | None:
         stmt = (
             select(Task)
             .options(
                 selectinload(Task.subtasks.and_(Subtask.deleted_at.is_(None))),
-                selectinload(Task.comments),
+                selectinload(Task.comments.and_(TaskComment.deleted_at.is_(None))),
                 selectinload(Task.attachments)
             )
             .where(Task.id == task_id, Task.deleted_at.is_(None))

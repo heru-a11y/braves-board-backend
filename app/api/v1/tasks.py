@@ -2,7 +2,7 @@ import uuid
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db
-from app.schemas.task import TaskCreateRequest, TaskUpdateRequest, TaskMoveRequest, TaskReorderRequest
+from app.schemas.task_schemas import TaskCreateRequest, TaskUpdateRequest, TaskMoveRequest, TaskReorderRequest
 from app.services.task_service import TaskService
 from app.api.dependencies.auth import get_current_user
 

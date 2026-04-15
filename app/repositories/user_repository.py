@@ -2,8 +2,8 @@ import uuid
 from datetime import datetime, timezone
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.models.user import User
-from app.schemas.user import UserCreate
+from app.models.user_model import User
+from app.schemas.user_schemas import UserCreate
 
 class UserRepository:
     def __init__(self, session: AsyncSession):
