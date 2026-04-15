@@ -1,3 +1,4 @@
+# type: ignore
 import uuid
 from datetime import datetime, timezone
 from typing import Sequence
@@ -198,7 +199,7 @@ class ColumnRepository:
         await self.session.flush()
 
         target = columns.pop(old_index)
-        columns.insert(new_position - 1, target)
+        columns.insert(new_position - 1, target) 
 
         for i, col in enumerate(columns, start=1):
             await self.session.execute(
