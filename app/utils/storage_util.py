@@ -29,3 +29,18 @@ class StorageUtil:
             expiration=timedelta(minutes=expiration_minutes),
             method="GET",
         )
+    
+    def delete_file(self, file_url: str) -> bool:
+        prefix = f"https://storage.googleapis.com/{self.bucket_name}/"
+
+        if not file_url.startswith(prefix):
+            return False
+        
+        blob_name = file_url.replace(prefix, "")
+        blob = self.bucket.blob(blob_name)
+        
+        try:
+            blob.delete()
+            return True
+        except Exception:
+            return False

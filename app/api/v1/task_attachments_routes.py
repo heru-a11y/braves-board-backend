@@ -6,8 +6,11 @@ from app.api.dependencies.auth import get_current_user
 from app.schemas.task_attachment_schemas import TaskAttachmentResponse, AddLinkRequest
 from app.repositories.task_attachment_repository import TaskAttachmentRepository
 from app.services.task_attachment_service import TaskAttachmentService
+from app.exceptions.task_attachment_exceptions import AttachmentNotFoundException
 
 router = APIRouter(prefix="/tasks/{task_id}/attachments", tags=["Task Attachments"])
+
+attachments_router = APIRouter(prefix="/attachments", tags=["Attachments"])
 
 @router.post("/file", response_model=dict, status_code=status.HTTP_201_CREATED)
 async def upload_task_attachment(
@@ -46,3 +49,24 @@ async def add_task_attachment_link(
     attachment_dict = TaskAttachmentResponse.model_validate(attachment).model_dump(mode="json")
 
     return {"data": attachment_dict}
+
+@attachments_router.delete("/{id}", response_model=dict, status_code=status.HTTP_200_OK)
+async def delete_attachment(
+    id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
+
+    repository = TaskAttachmentRepository(db)
+    service = TaskAttachmentService(repository)
+    
+    attachment = await service.delete_attachment(id)
+    
+    if not attachment:
+        raise AttachmentNotFoundException()
+    
+    return {
+        "data": {
+            "message": "Lampiran berhasil dihapus"
+        }
+    }

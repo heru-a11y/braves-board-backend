@@ -29,3 +29,10 @@ class VideoTooLargeException(CustomException):
             status_code=status.HTTP_400_BAD_REQUEST,
             message=task_attachment_messages.FILE_TOO_LARGE_VIDEO
         )
+
+class AttachmentNotFoundException(CustomException):
+    def __init__(self):
+        super().__init__(
+            status_code=status.HTTP_404_NOT_FOUND,
+            message=task_attachment_messages.ATTACHMENT_NOT_FOUND
+        )

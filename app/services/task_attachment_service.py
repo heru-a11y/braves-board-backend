@@ -68,3 +68,15 @@ class TaskAttachmentService:
             file_url=url,
         )
         return await self.repository.create(attachment_in)
+    
+    async def delete_attachment(self, attachment_id: uuid.UUID):
+        attachment = await self.repository.get_by_id(attachment_id)
+        if not attachment:
+            return None
+        
+        if attachment.type != "link":
+            self.storage_util.delete_file(attachment.file_url)
+        
+        await self.repository.delete(attachment_id)
+        
+        return attachment
