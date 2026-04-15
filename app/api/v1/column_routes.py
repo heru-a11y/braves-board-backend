@@ -3,8 +3,12 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
-from app.schemas.column import ColumnCreate, ColumnUpdate
-from app.schemas.column_response import ColumnSingleResponse, ColumnListResponse
+from app.schemas.column_schemas import (
+    ColumnCreate,
+    ColumnUpdate,
+    ColumnSingleResponse,
+    ColumnListResponse,
+)
 from app.services.column_service import ColumnService
 from app.api.dependencies.auth import get_current_user
 
