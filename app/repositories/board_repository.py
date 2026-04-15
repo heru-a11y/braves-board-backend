@@ -2,6 +2,7 @@ import uuid
 from datetime import datetime, timezone
 from typing import Sequence
 from sqlalchemy import select, update
+from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.board_model import Board
 from app.schemas.board_schemas import BoardCreate
@@ -16,7 +17,9 @@ class BoardRepository:
         board_id: uuid.UUID,
         user_id: uuid.UUID
     ) -> Board | None:
-        stmt = select(Board).where(
+        stmt = select(Board).options(
+            selectinload(Board.columns)
+        ).where(
             Board.id == board_id,
             Board.user_id == user_id,
             Board.deleted_at.is_(None)

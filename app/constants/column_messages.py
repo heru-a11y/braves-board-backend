@@ -1,23 +1,23 @@
 class SuccessMessage:
-    COLUMN_CREATED = "Column created successfully"
-    COLUMN_UPDATED = "Column updated successfully"
-    COLUMN_DELETED = "Column deleted successfully"
-    COLUMN_REORDERED = "Column reordered successfully"
-    COLUMNS_FETCHED = "Columns fetched successfully"
-    COLUMN_FETCHED = "Column fetched successfully"
+    COLUMN_CREATED = "Kolom berhasil dibuat"
+    COLUMN_UPDATED = "Kolom berhasil diperbarui"
+    COLUMN_DELETED = "Kolom berhasil dihapus"
+    COLUMN_REORDERED = "Urutan kolom berhasil diperbarui"
+    COLUMNS_FETCHED = "Berhasil mengambil data kolom"
+    COLUMN_FETCHED = "Berhasil mengambil data kolom"
 
-    BOARD_FETCHED = "Boards fetched successfully"
-    BOARD_CREATED = "Board created successfully"
+    BOARD_FETCHED = "Berhasil mengambil data board"
+    BOARD_CREATED = "Board berhasil dibuat"
 
 class ErrorMessage:
-    NOT_FOUND = "Data not found"
-    COLUMN_NOT_FOUND = "Column not found"
-    BOARD_NOT_FOUND = "Board not found"
+    NOT_FOUND = "Data tidak ditemukan"
+    COLUMN_NOT_FOUND = "Kolom tidak ditemukan"
+    BOARD_NOT_FOUND = "Board tidak ditemukan"
 
-    INVALID_POSITION = "Invalid position"
-    UNAUTHORIZED = "Unauthorized access"
-    FORBIDDEN = "Forbidden action"
+    INVALID_POSITION = "Posisi tidak valid"
+    UNAUTHORIZED = "Akses tidak diizinkan"
+    FORBIDDEN = "Aksi tidak diperbolehkan"
 
 class ValidationMessage:
-    TITLE_REQUIRED = "Title is required"
-    INVALID_UUID = "Invalid UUID format"
+    TITLE_REQUIRED = "Judul wajib diisi"
+    INVALID_UUID = "Format UUID tidak valid"

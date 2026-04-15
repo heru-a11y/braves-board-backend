@@ -4,11 +4,23 @@ from app.core.redis import redis_client
 from app.schemas.board_schemas import BoardCreate
 from app.constants.board_messages import BoardMessage, BoardResponseMessage
 from app.repositories.board_repository import BoardRepository
+from app.repositories.column_repository import ColumnRepository
 from datetime import datetime, timezone
 
+
 class BoardService:
-    def __init__(self, repo: BoardRepository):
+    def __init__(self, repo: BoardRepository, session):
         self.repo = repo
+        self.column_repo = ColumnRepository(session)
+
+    def _board_to_dict(self, board):
+        return {
+            "id": str(board.id),
+            "title": board.title,
+            "user_id": str(board.user_id),
+            "created_at": board.created_at,
+            "updated_at": board.updated_at,
+        }
 
     async def _lazy_hook(self, user_id: uuid.UUID) -> str:
         key = f"user:{user_id}:last_ping"
@@ -19,7 +31,10 @@ class BoardService:
             return "offline"
 
         try:
-            last_ping = datetime.fromisoformat(last_ping.decode())
+            if isinstance(last_ping, bytes):
+                last_ping = last_ping.decode()
+
+            last_ping = datetime.fromisoformat(last_ping)
         except Exception:
             return "offline"
 
@@ -48,7 +63,7 @@ class BoardService:
 
         return {
             "message": BoardResponseMessage.SUCCESS_GET_ALL,
-            "data": boards,
+            "data": [self._board_to_dict(b) for b in boards],
             "meta": {
                 "limit": limit,
                 "offset": offset,
@@ -67,11 +82,33 @@ class BoardService:
                 detail=BoardMessage.NOT_FOUND
             )
 
+        columns = await self.column_repo.get_all_by_board_id(board_id)
+        columns = columns or []
+
         return {
             "message": BoardResponseMessage.SUCCESS_GET_DETAIL,
-            "data": board,
+            "data": {
+                "id": str(board.id),
+                "title": board.title,
+                "user_id": str(board.user_id),
+                "created_at": board.created_at,
+                "updated_at": board.updated_at,
+                "columns": [
+                    {
+                        "id": str(c.id),
+                        "title": c.title,
+                        "board_id": str(c.board_id),
+                        "position": c.position,
+                        "created_at": c.created_at,
+                        "updated_at": c.updated_at,
+                        "deleted_at": c.deleted_at,
+                    }
+                    for c in columns
+                ],
+                "tasks": []
+            },
             "meta": {
-                "has_columns": True,
+                "has_columns": len(columns) > 0,
                 "status": user_status
             }
         }
@@ -81,7 +118,7 @@ class BoardService:
 
         return {
             "message": BoardResponseMessage.SUCCESS_CREATE,
-            "data": board
+            "data": self._board_to_dict(board)
         }
 
     async def update(
@@ -105,7 +142,7 @@ class BoardService:
 
         return {
             "message": BoardResponseMessage.SUCCESS_UPDATE,
-            "data": board
+            "data": self._board_to_dict(board)
         }
 
     async def delete(self, board_id: uuid.UUID, user_id: uuid.UUID):
