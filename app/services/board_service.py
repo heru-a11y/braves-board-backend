@@ -5,6 +5,7 @@ from app.schemas.board_schemas import BoardCreate
 from app.constants.board_messages import BoardMessage, BoardResponseMessage
 from app.repositories.board_repository import BoardRepository
 from app.repositories.column_repository import ColumnRepository
+from app.repositories.task_repository import TaskRepository
 from datetime import datetime, timezone
 
 
@@ -12,6 +13,7 @@ class BoardService:
     def __init__(self, repo: BoardRepository, session):
         self.repo = repo
         self.column_repo = ColumnRepository(session)
+        self.task_repo = TaskRepository(session)
 
     def _board_to_dict(self, board):
         return {
@@ -85,6 +87,24 @@ class BoardService:
         columns = await self.column_repo.get_all_by_board_id(board_id)
         columns = columns or []
 
+        tasks = await self.task_repo.get_all_by_board_id(board_id)
+        tasks = tasks or []
+
+        tasks_by_column = {}
+        for task in tasks:
+            col_id = str(task.column_id)
+            if col_id not in tasks_by_column:
+                tasks_by_column[col_id] = []
+
+            tasks_by_column[col_id].append({
+                "id": str(task.id),
+                "title": task.title,
+                "column_id": str(task.column_id),
+                "position": task.position,
+                "created_at": task.created_at,
+                "updated_at": task.updated_at,
+            })
+
         return {
             "message": BoardResponseMessage.SUCCESS_GET_DETAIL,
             "data": {
@@ -102,10 +122,10 @@ class BoardService:
                         "created_at": c.created_at,
                         "updated_at": c.updated_at,
                         "deleted_at": c.deleted_at,
+                        "tasks": tasks_by_column.get(str(c.id), [])  # 🔥 INJECT TASK
                     }
                     for c in columns
-                ],
-                "tasks": []
+                ]
             },
             "meta": {
                 "has_columns": len(columns) > 0,

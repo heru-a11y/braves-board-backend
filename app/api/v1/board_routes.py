@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db
 from app.repositories.board_repository import BoardRepository
 from app.services.board_service import BoardService
-from app.schemas.board import BoardCreate, BoardUpdate
+from app.schemas.board_schemas import BoardCreate, BoardUpdate
 from app.api.dependencies.auth import get_current_user
 
 router = APIRouter(prefix="/api/v1/boards", tags=["Boards"])

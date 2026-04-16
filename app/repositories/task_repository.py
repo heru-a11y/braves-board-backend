@@ -8,6 +8,7 @@ from app.models.task_model import Task
 from app.models.task_comment_model import TaskComment
 from app.models.task_attachment_model import TaskAttachment
 from app.models.subtask_model import Subtask
+from app.models.column_model import Column
 from app.schemas.task_schemas import TaskCreate
 
 class TaskRepository:
@@ -39,6 +40,20 @@ class TaskRepository:
         )
         result = await self.session.execute(stmt)
         return result.all()
+
+    async def get_all_by_board_id(self, board_id: uuid.UUID) -> Sequence[Task]:
+        stmt = (
+            select(Task)
+            .join(Column, Task.column_id == Column.id)
+            .where(
+                Column.board_id == board_id,
+                Task.deleted_at.is_(None),
+                Column.deleted_at.is_(None)
+            )
+            .order_by(Column.id, Task.position)
+        )
+        result = await self.session.execute(stmt)
+        return result.scalars().all()
 
     async def get_max_position(self, column_id: uuid.UUID) -> int:
         stmt = select(func.max(Task.position)).where(

@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from typing import Optional, List
 from pydantic import BaseModel, ConfigDict, field_validator
-from app.schemas.column import ColumnResponse
+from app.schemas.column_schemas import ColumnResponse
 
 
 class BoardBase(BaseModel):

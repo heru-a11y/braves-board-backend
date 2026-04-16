@@ -26,11 +26,14 @@ class RedisTimerRepository:
         
         if not data:
             return None
-            
+
+        data = {k.decode(): v.decode() for k, v in data.items()}  # 🔥 FIX
+
         return ActiveTimerRedis(
             start_time=datetime.fromisoformat(data["start_time"]),
             last_ping_at=datetime.fromisoformat(data["last_ping_at"]),
-            last_confirmed_at=datetime.fromisoformat(data["last_confirmed_at"])
+            last_confirmed_at=datetime.fromisoformat(data["last_confirmed_at"]),
+            waiting_confirmation=data.get("waiting_confirmation", "false") == "true"
         )
 
     async def update_ping(self, task_id: uuid.UUID, ping_time: datetime) -> None:
