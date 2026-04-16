@@ -5,6 +5,7 @@ from fastapi import HTTPException
 from app.core.redis import redis_client
 from app.repositories.task_repository import TaskRepository
 from app.repositories.time_log_repository import TimeLogRepository
+from app.schemas.time_log_schemas import TimeLogCreate
 
 
 class TaskTimerService:
@@ -25,7 +26,6 @@ class TaskTimerService:
             raise HTTPException(status_code=400, detail="Timer already running")
 
         now = datetime.now(timezone.utc)
-
         key = self._get_key(task_id)
 
         await redis_client.hset(key, mapping={
@@ -34,10 +34,10 @@ class TaskTimerService:
             "last_confirm": now.isoformat()
         })
 
-        await self.time_log_repo.create({
-            "task_id": task_id,
-            "start_time": now
-        })
+        await self.time_log_repo.create(TimeLogCreate(
+            task_id=task_id,
+            start_time=now
+        ))
 
         await self.task_repo.update(task_id, {
             "is_timer_running": True,
@@ -56,26 +56,34 @@ class TaskTimerService:
             raise HTTPException(status_code=400, detail="Timer not running")
 
         key = self._get_key(task_id)
-
         data = await redis_client.hgetall(key)
 
         if not data:
             raise HTTPException(status_code=400, detail="Timer state lost")
 
-        data = {k.decode(): v.decode() for k, v in data.items()}
+        data = {
+            (k.decode() if isinstance(k, bytes) else k):
+            (v.decode() if isinstance(v, bytes) else v)
+            for k, v in data.items()
+        }
 
         start_time = datetime.fromisoformat(data["start_time"])
+        if start_time.tzinfo is None:
+            start_time = start_time.replace(tzinfo=timezone.utc)
+
         now = datetime.now(timezone.utc)
 
         duration = int((now - start_time).total_seconds())
-        new_total = task.total_duration + duration
+        new_total = (task.total_duration or 0) + duration
 
         logs = await self.time_log_repo.get_all_by_task_id(task_id)
         if logs:
             last_log = logs[-1]
-            if last_log.end_time is None:
+
+            if last_log.stop_time is None:
                 await self.time_log_repo.update(last_log.id, {
-                    "end_time": now
+                    "stop_time": now,
+                    "duration_seconds": int((now - last_log.start_time).total_seconds())
                 })
 
         await self.task_repo.update(task_id, {
@@ -94,26 +102,34 @@ class TaskTimerService:
 
     async def ping(self, task_id: uuid.UUID):
         key = self._get_key(task_id)
-
         data = await redis_client.hgetall(key)
 
         if not data:
             raise HTTPException(status_code=400, detail="Timer not active")
 
-        data = {k.decode(): v.decode() for k, v in data.items()}
+        data = {
+            (k.decode() if isinstance(k, bytes) else k):
+            (v.decode() if isinstance(v, bytes) else v)
+            for k, v in data.items()
+        }
 
         now = datetime.now(timezone.utc)
 
         last_ping = datetime.fromisoformat(data["last_ping"])
+        if last_ping.tzinfo is None:
+            last_ping = last_ping.replace(tzinfo=timezone.utc)
+
         last_confirm = datetime.fromisoformat(data["last_confirm"])
+        if last_confirm.tzinfo is None:
+            last_confirm = last_confirm.replace(tzinfo=timezone.utc)
 
         if now - last_ping > timedelta(minutes=5):
             await self.stop_timer(task_id)
-            raise HTTPException(status_code=400, detail="Auto stopped: no activity")
+            return {"message": "Auto stopped: no activity"}
 
         if now - last_confirm > timedelta(minutes=10):
             await self.stop_timer(task_id)
-            raise HTTPException(status_code=400, detail="Auto stopped: no confirmation")
+            return {"message": "Auto stopped: no confirmation"}
 
         await redis_client.hset(key, "last_ping", now.isoformat())
 
@@ -123,7 +139,6 @@ class TaskTimerService:
         key = self._get_key(task_id)
 
         exists = await redis_client.exists(key)
-
         if not exists:
             raise HTTPException(status_code=400, detail="Timer not active")
 
