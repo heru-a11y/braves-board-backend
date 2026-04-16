@@ -46,3 +46,11 @@ async def confirm_timer(
     current_user=Depends(get_current_user),
 ):
     return await service.confirm(task_id)
+
+@router.get("/{task_id}/timer/logs", status_code=status.HTTP_200_OK)
+async def get_time_logs(
+    task_id: uuid.UUID,
+    service: TaskTimerService = Depends(get_timer_service),
+    current_user=Depends(get_current_user),
+):
+    return await service.get_time_logs(task_id)
