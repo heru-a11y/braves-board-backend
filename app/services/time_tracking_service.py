@@ -147,3 +147,27 @@ class TaskTimerService:
         await redis_client.hset(key, "last_confirm", now.isoformat())
 
         return {"message": "User confirmed activity"}
+
+    async def get_time_logs(self, task_id: uuid.UUID):
+        task = await self.task_repo.get_by_id(task_id)
+
+        if not task:
+            raise HTTPException(status_code=404, detail="Task not found")
+
+        logs = await self.time_log_repo.get_all_by_task_id(task_id)
+
+        return {
+            "task_id": task_id,
+            "count": len(logs),
+            "logs": [
+                {
+                    "id": str(log.id),
+                    "start_time": log.start_time,
+                    "stop_time": log.stop_time,
+                    "duration_seconds": log.duration_seconds,
+                    "created_at": log.created_at,
+                    "activity_description": log.activity_description
+                }
+                for log in logs
+            ]
+        }
