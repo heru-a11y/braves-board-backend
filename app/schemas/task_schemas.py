@@ -7,6 +7,7 @@ from app.schemas.subtask_schemas import SubtaskResponse
 from app.schemas.task_comment_schemas import TaskCommentResponse
 from app.schemas.task_attachment_schemas import TaskAttachmentResponse
 
+
 class TaskBase(BaseModel):
     title: str
     description: Optional[str] = None
@@ -16,8 +17,10 @@ class TaskBase(BaseModel):
     is_timer_running: bool = False
     assignee_ids: Optional[List[uuid.UUID]] = None
 
+
 class TaskCreate(TaskBase):
     column_id: uuid.UUID
+
 
 class TaskResponse(TaskBase):
     id: uuid.UUID
@@ -26,7 +29,11 @@ class TaskResponse(TaskBase):
     updated_at: datetime
     deleted_at: Optional[datetime] = None
 
+    start_time: Optional[datetime] = None
+    total_duration: Optional[int] = 0
+
     model_config = ConfigDict(from_attributes=True)
+
 
 class TaskCreateRequest(BaseModel):
     column_id: uuid.UUID
@@ -35,6 +42,7 @@ class TaskCreateRequest(BaseModel):
     due_date: Optional[datetime] = None
     labels: Optional[List[str]] = None
     assignee_ids: Optional[List[uuid.UUID]] = None
+
 
 class TaskListResponse(BaseModel):
     id: uuid.UUID
@@ -47,6 +55,9 @@ class TaskListResponse(BaseModel):
     attachment_count: int
     is_timer_running: bool
 
+    total_duration: Optional[int] = 0
+
+
 class TaskDetailResponse(TaskBase):
     id: uuid.UUID
     subtasks: List[SubtaskResponse] = []
@@ -55,6 +66,7 @@ class TaskDetailResponse(TaskBase):
 
     model_config = ConfigDict(from_attributes=True)
 
+
 class TaskUpdateRequest(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
@@ -62,9 +74,11 @@ class TaskUpdateRequest(BaseModel):
     labels: Optional[List[str]] = None
     assignee_ids: Optional[List[uuid.UUID]] = None
 
+
 class TaskMoveRequest(BaseModel):
     column_id: uuid.UUID
     position: int
+
 
 class TaskMoveResponse(BaseModel):
     id: uuid.UUID
@@ -73,8 +87,10 @@ class TaskMoveResponse(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
+
 class TaskReorderRequest(BaseModel):
     position: int
+
 
 class TaskReorderResponse(BaseModel):
     id: uuid.UUID

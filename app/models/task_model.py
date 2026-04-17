@@ -20,8 +20,14 @@ class Task(Base):
     due_date: Mapped[DateTime | None] = mapped_column(DateTime(timezone=True), index=True, nullable=True)
     labels: Mapped[list[str] | None] = mapped_column(ARRAY(String), nullable=True)
     position: Mapped[int] = mapped_column(Integer, nullable=False)
+
     is_timer_running: Mapped[bool] = mapped_column(Boolean, server_default="false", index=True, nullable=False)
+
+    start_time: Mapped[DateTime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    total_duration: Mapped[int] = mapped_column(Integer, server_default="0", nullable=False)
+
     assignee_ids: Mapped[list[uuid.UUID] | None] = mapped_column(ARRAY(UUID(as_uuid=True)), index=True, nullable=True)
+
     created_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
     deleted_at: Mapped[DateTime | None] = mapped_column(DateTime(timezone=True), index=True, nullable=True)

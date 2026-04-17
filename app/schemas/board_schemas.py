@@ -1,7 +1,8 @@
 import uuid
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 from pydantic import BaseModel, ConfigDict, field_validator
+from app.schemas.column_schemas import ColumnResponse
 
 
 class BoardBase(BaseModel):
@@ -41,5 +42,6 @@ class BoardResponse(BoardBase):
     user_id: uuid.UUID
     created_at: datetime
     updated_at: datetime
+    columns: List[ColumnResponse] = []
 
     model_config = ConfigDict(from_attributes=True)

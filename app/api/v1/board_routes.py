@@ -12,7 +12,7 @@ router = APIRouter(prefix="/api/v1/boards", tags=["Boards"])
 
 def get_board_service(db: AsyncSession = Depends(get_db)) -> BoardService:
     repo = BoardRepository(db)
-    return BoardService(repo)
+    return BoardService(repo, db)
 
 @router.get("", status_code=status.HTTP_200_OK)
 async def get_boards(
