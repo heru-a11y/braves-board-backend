@@ -80,7 +80,6 @@ async def confirm_timer(
 ):
     return await service.confirm(task_id)
 
-
 @router.get(
     "/{task_id}/timer/logs",
     status_code=status.HTTP_200_OK,
