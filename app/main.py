@@ -4,7 +4,8 @@ from contextlib import asynccontextmanager
 from app.core.database import engine, redis_client
 from app.middlewares.cors import setup_cors
 from app.exceptions.setup import setup_exception_handlers
-from app.api.v1 import auth_routes, board_routes, column_routes, subtasks_routes, task_attachments_routes, task_comments_routes, tasks_routes, time_tracking_routes
+from app.api.v1 import auth_routes, board_routes, column_routes, subtasks_routes, task_attachments_routes, task_comments_routes, tasks_routes, time_tracking_routes, daily_cleanup_routes
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -30,3 +31,4 @@ app.include_router(task_comments_routes.router)
 app.include_router(task_attachments_routes.router)
 app.include_router(task_attachments_routes.attachments_router)
 app.include_router(time_tracking_routes.router)
+app.include_router(daily_cleanup_routes.router)

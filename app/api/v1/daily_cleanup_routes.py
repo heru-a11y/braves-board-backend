@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
-from app.services.cleanup_service import CleanupService
+from app.services.daily_cleanup_service import CleanupService
 from app.repositories.time_log_repository import TimeLogRepository
 from app.repositories.task_repository import TaskRepository
 
