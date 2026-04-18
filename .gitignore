@@ -34,7 +34,6 @@ src/backend/app/config/env/*.env
 # =========================
 # Secrets / Credentials
 # =========================
-gcp-service-account.json
 src/backend/app/config/credentials/
 
 # =========================
