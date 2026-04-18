@@ -1,5 +1,74 @@
-.env
+# =========================
+# Python
+# =========================
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+*.py[cod]
+
+# =========================
+# Virtual Environment
+# =========================
 .venv/
+venv/
+
+# =========================
+# Packaging / Build
+# =========================
+*.egg-info/
+build/
+dist/
+.eggs/
+
+# =========================
+# Environment Variables
+# =========================
+.env
+*.env
+src/backend/app/config/env/*.env
+!*.example.env
+!.env.example
+!src/backend/app/config/env/*.example.env
+
+# =========================
+# Secrets / Credentials
+# =========================
 gcp-service-account.json
+src/backend/app/config/credentials/
+
+# =========================
+# Logs
+# =========================
+*.log
+
+# =========================
+# Database / Local artifacts
+# =========================
+*.sqlite
+*.db
+
+# =========================
+# Testing & Linters (TAMBAHAN BARU)
+# =========================
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# =========================
+# IDE
+# =========================
+.vscode/
+.idea/
+
+# =========================
+# OS
+# =========================
+.DS_Store
+
+# =========================
+# Docker
+# =========================
+docker-compose.override.yml

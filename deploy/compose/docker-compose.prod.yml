@@ -1,0 +1,45 @@
+services:
+  api:
+    build:
+      context: ../../
+      dockerfile: deploy/docker/Dockerfile.prod
+    container_name: braves_board_backend_prod
+    ports:
+      - "8000:8000"
+    env_file:
+      - ../../src/backend/app/config/env/production.env
+    depends_on:
+      - db
+      - redis
+    restart: always
+
+  migrator:
+    build:
+      context: ../../
+      dockerfile: deploy/docker/Dockerfile.prod
+    container_name: braves_board_migrator_prod
+    command: ["sh", "/app/deploy/docker/entrypoints/migrator.sh"]
+    env_file:
+      - ../../src/backend/app/config/env/production.env
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15
+    container_name: braves_board_db_prod
+    env_file:
+      - ../../src/backend/app/config/env/production.env
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data
+    restart: always
+
+  redis:
+    image: redis:7
+    container_name: braves_board_redis_prod
+    volumes:
+      - redis_data_prod:/data
+    restart: always
+
+volumes:
+  postgres_data_prod:
+  redis_data_prod:
