@@ -1,0 +1,108 @@
+services:
+  api:
+    build:
+      context: ../../
+      dockerfile: deploy/docker/Dockerfile.dev
+    container_name: braves_board_backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ../../src/backend:/app
+    env_file:
+      - ../../src/backend/app/config/env/development.env
+    depends_on:
+      - db
+      - redis
+    restart: always
+
+  migrator:
+    build:
+      context: ../../
+      dockerfile: deploy/docker/Dockerfile.dev
+    container_name: braves_board_migrator
+    command: ["sh", "/usr/src/app/deploy/docker/entrypoints/migrator.sh"]
+    volumes:
+      - ../../:/usr/src/app
+    env_file:
+      - ../../src/backend/app/config/env/development.env
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15
+    container_name: braves_board_db
+    env_file:
+      - ../../src/backend/app/config/env/development.env
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: ${DB_NAME:-braves_board_db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7
+    container_name: braves_board_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: always
+
+  redisinsight:
+    image: redis/redisinsight:latest
+    container_name: braves_board_redisinsight
+    ports:
+      - "5540:5540"
+    volumes:
+      - redisinsight_data:/data
+    depends_on:
+      - redis
+    restart: always
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: braves_board_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@bangunindo.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "8080:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      - db
+    restart: always
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: braves_board_prometheus
+    volumes:
+      - ../../src/backend/app/observability/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+    restart: always
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: braves_board_grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    restart: always
+
+volumes:
+  postgres_data:
+  pgadmin_data:
+  redis_data:
+  redisinsight_data:
+  prometheus_data:
+  grafana_data:
