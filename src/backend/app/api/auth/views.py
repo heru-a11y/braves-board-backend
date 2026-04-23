@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from fastapi import APIRouter, Depends, Response, Cookie
+from fastapi import APIRouter, Depends, Response, Cookie, Query
 from fastapi.security import HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
 from jose import jwt
@@ -29,33 +29,31 @@ async def google_login():
     auth_url = AuthUseCase.get_google_auth_url()
     return success_response(AuthUrlData(auth_url=auth_url))
 
-@router.post("/google/callback", response_model=StandardResponse[TokenData])
+from fastapi import Query
+from fastapi.responses import RedirectResponse
+
+@router.get("/google/callback")
 async def google_callback(
-    request: AuthCallbackRequest,
     response: Response,
+    code: str = Query(...),
     db: AsyncSession = Depends(get_db),
 ):
     user_repo = UserRepository(db)
-    result = await AuthUseCase.handle_google_callback(request.code, user_repo)
+    result = await AuthUseCase.handle_google_callback(code, user_repo)
 
     response.set_cookie(
         key="refresh_token",
         value=result["refresh_token"],
         httponly=True,
-        secure=True,
+        secure=False,  # Set False untuk development localhost
         samesite="lax",
         path="/",
         max_age=604800,
     )
 
-    return success_response(TokenData(
-        id=result["user"].id,
-        email=result["user"].email,
-        google_id=result["user"].google_id,
-        access_token=result["access_token"],
-        token_type="bearer",
-        expires_in=result["expires_in"],
-    ))
+    redirect_url = f"{settings.FRONTEND_URL}/dashboard?access_token={result['access_token']}"
+    
+    return RedirectResponse(url=redirect_url)
 
 @router.get("/me", response_model=StandardResponse[CurrentUserData])
 async def get_current_user_profile(current_user: User = Depends(get_current_user)):
