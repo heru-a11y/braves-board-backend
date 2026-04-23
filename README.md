@@ -81,7 +81,8 @@ GOOGLE_REDIRECT_URI=http://test.local/callback
 # ==========================================
 # FRONTEND / CORS
 # ==========================================
-FRONTEND_URL=http://localhost:3000
+<!-- FRONTEND_URL=http://localhost:3000 -->
+FRONTEND_URL=http://localhost:5173
 
 # ==========================================
 # STORAGE MOCK

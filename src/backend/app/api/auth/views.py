@@ -39,21 +39,35 @@ async def google_callback(
     db: AsyncSession = Depends(get_db),
 ):
     user_repo = UserRepository(db)
-    result = await AuthUseCase.handle_google_callback(code, user_repo)
 
-    response.set_cookie(
-        key="refresh_token",
-        value=result["refresh_token"],
-        httponly=True,
-        secure=False,  # Set False untuk development localhost
-        samesite="lax",
-        path="/",
-        max_age=604800,
-    )
+    try:
+        print("CODE:", code)
 
-    redirect_url = f"{settings.FRONTEND_URL}/dashboard?access_token={result['access_token']}"
-    
-    return RedirectResponse(url=redirect_url)
+        result = await AuthUseCase.handle_google_callback(code, user_repo)
+
+        print("SUCCESS LOGIN:", result)
+
+        response.set_cookie(
+            key="refresh_token",
+            value=result["refresh_token"],
+            httponly=True,
+            secure=False,  # dev
+            samesite="lax",
+            path="/",
+            max_age=604800,
+        )
+
+        return RedirectResponse(
+            url=f"{settings.FRONTEND_URL}/dashboard?access_token={result['access_token']}"
+        )
+
+    except Exception as e:
+        print(" ERROR GOOGLE:", str(e))
+
+        return RedirectResponse(
+            url=f"{settings.FRONTEND_URL}/?error=google_auth_failed"
+        )
+    # return RedirectResponse(url=redirect_url)
 
 @router.get("/me", response_model=StandardResponse[CurrentUserData])
 async def get_current_user_profile(current_user: User = Depends(get_current_user)):
