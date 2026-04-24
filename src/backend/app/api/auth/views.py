@@ -58,14 +58,14 @@ async def google_callback(
         )
 
         return RedirectResponse(
-            url=f"{settings.FRONTEND_URL}/dashboard?access_token={result['access_token']}"
+            url=f"http://localhost:5173/dashboard?access_token={result['access_token']}"
         )
 
     except Exception as e:
         print(" ERROR GOOGLE:", str(e))
 
         return RedirectResponse(
-            url=f"{settings.FRONTEND_URL}/?error=google_auth_failed"
+            url=f"http://localhost:5173/?error=google_auth_failed"
         )
     # return RedirectResponse(url=redirect_url)
 
