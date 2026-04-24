@@ -62,6 +62,7 @@ async def google_callback(
         )
 
     except Exception as e:
+        import traceback
         print(" ERROR GOOGLE:", str(e))
 
         return RedirectResponse(
