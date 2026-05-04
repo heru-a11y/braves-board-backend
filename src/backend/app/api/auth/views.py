@@ -64,6 +64,7 @@ async def google_callback(
     except Exception as e:
         import traceback
         print(" ERROR GOOGLE:", str(e))
+        traceback.print_exc()
 
         return RedirectResponse(
             url=f"http://localhost:5173/?error=google_auth_failed"
