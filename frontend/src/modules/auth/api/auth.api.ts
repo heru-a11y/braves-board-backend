@@ -1,11 +1,5 @@
-// src/services/authService.ts
-import api from './api'
-import axios from 'axios'
-
-
-const BASE_URL =
-  import.meta.env.VITE_API_BASE_URL ||
-  'http://localhost:8000/api/v1'
+// src/modules/auth/api/auth.api.ts
+import api from '../../../app/api'
 
 export interface User {
   id: string
@@ -20,7 +14,7 @@ export interface AuthTokens {
 
 // 🔥 1. Ambil URL login Google dari backend
 export async function getGoogleLoginUrl(): Promise<string> {
-  const { data } = await axios.get(`${BASE_URL}/auth/google/login`)
+  const { data } = await api.get('/auth/google/login')
 
   const url =
     data?.data?.auth_url ||
@@ -41,8 +35,6 @@ export function saveTokenFromUrl() {
 
   if (token) {
     localStorage.setItem('access_token', token)
-
-    // bersihin URL
     window.history.replaceState({}, document.title, '/dashboard')
   }
 

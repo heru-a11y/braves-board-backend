@@ -1,15 +1,15 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { getBoards, createBoard as apiCreateBoard } from '../services/boardService'
-import { getColumns, createColumn as apiCreateColumn } from '../services/columnService'
+import { getBoards, createBoard as apiCreateBoard } from '../api/board.api'
+import { getColumns, createColumn as apiCreateColumn } from '../api/column.api'
 import {
   getTasks,
   createTask as apiCreateTask,
   deleteTask as apiDeleteTask,
   updateTask as apiUpdateTask,
   moveTask as apiMoveTask,
-} from '../services/taskService'
-import { createSubtask as apiCreateSubtask, updateSubtask as apiUpdateSubtask, deleteSubtask as apiDeleteSubtask, completeSubtask as apiCompleteSubtask } from '../services/subtaskService'
+} from '../api/task.api'
+import { createSubtask as apiCreateSubtask, updateSubtask as apiUpdateSubtask, deleteSubtask as apiDeleteSubtask, completeSubtask as apiCompleteSubtask } from '../api/subtask.api'
 
 export const useAppStore = defineStore('app', () => {
   // ─── Boards ───────────────────────────────────────────
@@ -76,7 +76,7 @@ export const useAppStore = defineStore('app', () => {
       description: task.description ?? '',
       status: task.status ?? 'To Do',
       completed: task.completed ?? false,
-      column_id: task.column_id ?? columnId ?? null,  // ← pakai columnId sebagai fallback
+      column_id: task.column_id ?? columnId ?? null,
     }
   }
 
@@ -112,7 +112,7 @@ export const useAppStore = defineStore('app', () => {
     const task = await apiCreateTask(columnId, title)
     const normalized = {
       ...normalizeTask(task),
-      column_id: task.column_id ?? columnId,  // ← paksa pakai columnId yang dikirim
+      column_id: task.column_id ?? columnId,
     }
     const col = findColById(columnId)
     if (col) col.tasks.push(normalized)
@@ -137,7 +137,7 @@ export const useAppStore = defineStore('app', () => {
     const toCol = findColById(toColumnId)
     const position = 0
 
-    console.log('moveTask payload:', { taskId, column_id: toColumnId, position })  // ← log ini
+    console.log('moveTask payload:', { taskId, column_id: toColumnId, position })
 
     await apiMoveTask(taskId, toColumnId, position)
 
@@ -151,6 +151,7 @@ export const useAppStore = defineStore('app', () => {
       }
     }
   }
+
   async function addSubtask(taskId: string, title: string) {
     const res = await apiCreateSubtask(taskId, title)
     const newSubtask = {
@@ -158,7 +159,6 @@ export const useAppStore = defineStore('app', () => {
       title,
       completed: false,
     }
-    // cari task di store dan tambah subtask
     for (const boardId in columnsByBoard.value) {
       for (const col of columnsByBoard.value[boardId]) {
         const task = col.tasks.find((t: any) => t.id === taskId)
@@ -178,7 +178,6 @@ export const useAppStore = defineStore('app', () => {
     } else {
       await apiUpdateSubtask(subtaskId, { title: undefined })
     }
-    // update di store
     for (const boardId in columnsByBoard.value) {
       for (const col of columnsByBoard.value[boardId]) {
         const task = col.tasks.find((t: any) => t.id === taskId)
@@ -207,7 +206,7 @@ export const useAppStore = defineStore('app', () => {
   return {
     boards, boardsLoaded, fetchBoards, addBoard,
     columnsByBoard, fetchColumns, addColumn,
-    fetchTasks, addTask, editTask, removeTask, moveTaskToColumn,addSubtask, toggleSubtask, removeSubtask,
+    fetchTasks, addTask, editTask, removeTask, moveTaskToColumn, addSubtask, toggleSubtask, removeSubtask,
   }
 }, {
   persist: {

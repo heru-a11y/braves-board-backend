@@ -116,11 +116,11 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import AppLayout from '../components/AppLayout.vue'
+import AppLayout from '../../../components/common/AppLayout.vue'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faPlay, faStop, faTag, faCalendar, faClock } from '@fortawesome/free-solid-svg-icons'
-import { startTimer, stopTimer, pingTimer as pingTimerApi, getTimerLogs } from '../services/timerService'
+import { startTimer, stopTimer, pingTimer as pingTimerApi, getTimerLogs } from '../../timer/api/timer.api'
 
 library.add(faPlay, faStop, faTag, faCalendar, faClock)
 

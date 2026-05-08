@@ -37,8 +37,8 @@ import {
   faUsers,
   faRightFromBracket
 } from '@fortawesome/free-solid-svg-icons'
-import type { MenuItem } from '../types'
-import api from '../services/api'
+import type { MenuItem } from '../../app/types/app.type'
+import api from '../../app/api'
 
 const router = useRouter()
 

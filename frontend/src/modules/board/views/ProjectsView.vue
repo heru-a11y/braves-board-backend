@@ -92,8 +92,8 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import AppLayout from '../components/AppLayout.vue'
-import type { Project } from '../types'
+import AppLayout from '../../../components/common/AppLayout.vue'
+import type { Project } from '../../../app/types/app.type'
 
 const filterLabels: string[] = ['Active', 'Client', 'Access']
 

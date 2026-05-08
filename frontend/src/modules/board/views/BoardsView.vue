@@ -23,7 +23,7 @@
         <div class="flex-1 overflow-y-auto px-2.5 py-2">
           <div v-if="!board.tasks?.length" class="text-xs text-gray-400 text-center py-8">No tasks</div>
 
-          <VueDraggable v-model="board.tasks" group="tasks" :data-column-id="board.id" animation="150"
+          <VueDraggable v-model="board.tasks" group="tasks" :data-column-id="board.id" :animation="150"
             ghost-class="opacity-40" chosen-class="shadow-lg" class="flex flex-col gap-2 min-h-[40px]"
             @end="onTaskDragEnd">
             <div v-for="task in board.tasks" :key="task.id" :data-id="task.id"
@@ -570,10 +570,10 @@
 <script setup lang="ts">
 import draggable from 'vuedraggable'
 import { VueDraggable } from 'vue-draggable-plus'
-import { moveTask as apiMoveTask } from '../services/taskService'
+import { moveTask as apiMoveTask } from '../api/task.api'
 import { useRoute } from 'vue-router'
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import Layout from '../components/AppLayout.vue'
+import Layout from '../../../components/common/AppLayout.vue'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import {
@@ -586,15 +586,15 @@ import {
   uploadAttachmentFile as apiUploadFile,
   addAttachmentLink as apiAddLink,
   deleteAttachment as apiDeleteAttachment,
-} from '../services/boardService'
+} from '../api/board.api'
 import {
   startTimer as apiStartTimer,
   stopTimer as apiStopTimer,
   pingTimer as apiPingTimer,
   confirmTimer as apiConfirmTimer,
   getTimerLogs as apiGetTimerLogs,
-} from '../services/timerService'
-import { useAppStore } from '../store/appStore'
+} from '../../timer/api/timer.api'
+import { useAppStore } from '../store/board.store'
 import { storeToRefs } from 'pinia'
 
 // ─── Types ────────────────────────────────────────────────────

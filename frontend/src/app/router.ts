@@ -1,14 +1,13 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
-import LoginView from '../views/LoginView.vue'
-import DashboardView from '../views/DashboardView.vue'
-import BoardsView from '../views/BoardsView.vue'
-import BoardsListView from '../views/BoardsListView.vue'
-import TimeTrackerView from '../views/TimeTrackerView.vue'
-import ReportsView from '../views/ReportsView.vue'
-import ProjectsView from '../views/ProjectsView.vue'
-import TeamView from '../views/TeamView.vue'
+import LoginView from '../modules/auth/views/LoginView.vue'
+import DashboardView from '../modules/dashboard/views/DashboardView.vue'
+import BoardsView from '../modules/board/views/BoardsView.vue'
+import BoardsListView from '../modules/board/views/BoardsListView.vue'
+import TimeTrackerView from '../modules/timer/views/TimeTrackerView.vue'
+import ReportsView from '../modules/reports/views/ReportsView.vue'
+import ProjectsView from '../modules/board/views/ProjectsView.vue'
+import TeamView from '../modules/team/views/TeamView.vue'
 
-// ← hapus routes yang lama, tinggal ini aja
 const routes: RouteRecordRaw[] = [
   { path: '/', component: LoginView, meta: { public: true } },
   { path: '/dashboard', component: DashboardView },
@@ -42,6 +41,5 @@ router.beforeEach((to, _from, next) => {
 
   next()
 })
-
 
 export default router

@@ -80,10 +80,10 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import AppLayout from '../components/AppLayout.vue'
-import { useAppStore } from '../store/appStore'
+import AppLayout from '../../../components/common/AppLayout.vue'
+import { useAppStore } from '../../board/store/board.store'
 import { storeToRefs } from 'pinia'
-import api from '../services/api'
+import api from '../../../app/api'
 
 interface User {
   id: string

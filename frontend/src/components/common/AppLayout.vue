@@ -3,7 +3,7 @@
     <!-- TOP HEADER -->
     <div class="h-14 bg-white border-b border-gray-200 flex items-center justify-between px-6 flex-shrink-0 relative">
       <div class="flex items-center gap-2 text-lg font-semibold">
-        <img src="../assets/Grid.png" alt="logo" class="w-5" />
+        <img src="../../assets/Grid.png" alt="logo" class="w-5" />
         <span class="text-gray-800">Braves</span>
         <span class="text-blue-600">Board</span>
       </div>
