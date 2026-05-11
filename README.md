@@ -51,7 +51,7 @@ Buat file baru bernama `development.env` di dalam folder `src/backend/app/config
 # ==========================================
 # APP CONFIGURATION
 # ==========================================
-PORT=8001
+PORT=8000
 
 # ==========================================
 # DATABASE CONFIGURATION

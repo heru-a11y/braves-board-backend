@@ -201,8 +201,8 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import AppLayout from '../components/AppLayout.vue'
-import type { TimeEntry, ChartDay, ChartSegment, ReportGroup, DonutSegment } from '../types'
+import AppLayout from '../../../components/common/AppLayout.vue'
+import type { TimeEntry, ChartDay, ChartSegment, ReportGroup, DonutSegment } from '../../../app/types/app.type'
 
 const filterOptions: string[] = ['Team', 'Client', 'Project', 'Task', 'Tag', 'Status', 'Description']
 const exportOpen     = ref<boolean>(false)

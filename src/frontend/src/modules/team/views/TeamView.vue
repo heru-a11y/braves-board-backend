@@ -105,9 +105,9 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import AppLayout from '../components/AppLayout.vue'
-import { getUsers } from '../services/boardService'
-import type { TeamMember, TeamGroup } from '../types'
+import AppLayout from '../../../components/common/AppLayout.vue'
+import { getUsers } from '../../board/api/board.api'
+import type { TeamMember, TeamGroup } from '../../../app/types/app.type'
 
 const tabs: string[] = ['Members', 'Groups']
 const activeTab = ref<string>('Members')

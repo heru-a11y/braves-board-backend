@@ -60,8 +60,8 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import Layout from '../components/AppLayout.vue'
-import { useAppStore } from '../store/appStore'
+import Layout from '../../../components/common/AppLayout.vue'
+import { useAppStore } from '../../board/store/board.store'
 import { storeToRefs } from 'pinia'
 
 const router = useRouter()

@@ -11,11 +11,10 @@
       <div class="bg-white dark:bg-gray-800 text-white dark:text-white p-8 rounded-xl">
         <div class="flex items-center justify-center gap-3 mb-6">
           <div class="p-5 text-lg font-semibold text-gray-700 dark:text-gray-200 border-b border-gray-200 flex items-center gap-1">
-            <img src="../assets/Grid.png" alt="" class="w-5" />
+            <img src="../../../assets/Grid.png" alt="" class="w-5" />
             Braves <span class="text-blue-600">Board</span>
           </div>
         </div>
-
 
         <!-- Error message -->
         <p v-if="errorMsg" class="text-red-500 text-xs text-center mb-3 px-1">{{ errorMsg }}</p>
@@ -26,7 +25,7 @@
           :disabled="isLoading"
           class="flex items-center justify-center gap-3 w-full border border-gray-300 py-2.5 px-4 rounded-lg hover:bg-gray-50 transition text-gray-700 dark:text-gray-200 dark:hover:bg-gray-700 font-medium text-sm disabled:opacity-60 disabled:cursor-not-allowed"
         >
-          <img src="../assets/google.png" alt="google" class="w-5 h-5" />
+          <img src="../../../assets/google.png" alt="google" class="w-5 h-5" />
           <span v-if="isLoading">Menghubungkan...</span>
           <span v-else>Sign in with Google</span>
         </button>
@@ -37,7 +36,7 @@
 
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
-import { getGoogleLoginUrl } from '../services/authService'
+import { getGoogleLoginUrl } from '../api/auth.api'
 
 const darkMode = ref<boolean>(false)
 const isLoading = ref(false)
@@ -60,7 +59,6 @@ async function handleGoogleLogin() {
     window.location.href = url
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : ''
-    // Tampilkan pesan error yang lebih informatif
     if (msg.includes('Network Error') || msg.includes('ECONNREFUSED')) {
       errorMsg.value = 'Server tidak dapat dijangkau. Pastikan backend sudah berjalan.'
     } else if (msg.includes('401') || msg.includes('Unauthorized')) {

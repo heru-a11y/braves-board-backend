@@ -1,8 +1,22 @@
 services:
+  frontend:
+    build:
+      context: ../../
+      dockerfile: deploy/docker/frontend.dev.Dockerfile
+    container_name: braves_board_frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ../../src/frontend:/app
+      - /app/node_modules
+    depends_on:
+      - api
+    restart: always
+
   api:
     build:
       context: ../../
-      dockerfile: deploy/docker/Dockerfile.dev
+      dockerfile: deploy/docker/backend.dev.Dockerfile
     container_name: braves_board_backend
     ports:
       - "8000:8000"
@@ -18,7 +32,7 @@ services:
   migrator:
     build:
       context: ../../
-      dockerfile: deploy/docker/Dockerfile.dev
+      dockerfile: deploy/docker/backend.dev.Dockerfile
     container_name: braves_board_migrator
     command: ["sh", "/usr/src/app/deploy/docker/entrypoints/migrator.sh"]
     volumes:

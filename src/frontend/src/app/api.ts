@@ -1,8 +1,8 @@
-// src/services/api.ts
+// src/app/api.ts
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: 'http://localhost:8000/api/v1',
+  baseURL: '/api/v1',
 })
 
 // 🔥 AUTO INJECT TOKEN
@@ -15,7 +15,6 @@ api.interceptors.request.use((config) => {
 
   return config
 })
-
 
 // Response interceptor: auto-refresh jika 401
 api.interceptors.response.use(
@@ -36,7 +35,6 @@ api.interceptors.response.use(
           return api(originalRequest)
         }
       } catch {
-        // Refresh gagal → hapus token & redirect ke login
         localStorage.removeItem('access_token')
         localStorage.removeItem('user')
         window.location.href = '/'
