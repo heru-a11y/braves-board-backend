@@ -45,7 +45,7 @@ async def google_callback(
         result = await AuthUseCase.handle_google_callback(code, user_repo)
 
         redirect_response = RedirectResponse(
-            url=f"http://localhost:5173/dashboard?access_token={result['access_token']}"
+            url=f"{settings.FRONTEND_URL}/dashboard?access_token={result['access_token']}"
         )
 
         redirect_response.set_cookie(
@@ -62,7 +62,7 @@ async def google_callback(
 
     except Exception:
         return RedirectResponse(
-            url="http://localhost:5173/?error=google_auth_failed"
+            url=f"{settings.FRONTEND_URL}/?error=google_auth_failed"
         )
 
 @router.get("/me", response_model=StandardResponse[CurrentUserData])
@@ -117,7 +117,7 @@ async def logout(
     response.delete_cookie(
         key="refresh_token",
         path="/",
-        secure=True,
+        secure=False,
         httponly=True,
         samesite="lax",
     )

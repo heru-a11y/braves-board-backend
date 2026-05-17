@@ -6,7 +6,7 @@ from app.models.user_model import User
 from app.api.user.use_cases import UserUseCase
 from app.api.standard_response import success_response
 
-router = APIRouter(prefix="/users", tags=["Users"])
+router = APIRouter(prefix="/api/v1/users", tags=["Users"])
 
 def get_user_use_case(db: AsyncSession = Depends(get_db)) -> UserUseCase:
     return UserUseCase(db)

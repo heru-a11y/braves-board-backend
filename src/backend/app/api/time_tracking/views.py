@@ -9,7 +9,7 @@ from app.api.time_tracking.schema import TimerPayload, TimerStopPayload
 from app.api.time_tracking.use_cases import TimeTrackingUseCase
 from app.api.standard_response import success_response
 
-router = APIRouter(prefix="/tasks", tags=["Task Timer"])
+router = APIRouter(prefix="/api/v1/tasks", tags=["Task Timer"])
 
 
 def get_time_tracking_use_case(db: AsyncSession = Depends(get_db)) -> TimeTrackingUseCase:

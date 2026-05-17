@@ -15,8 +15,7 @@ from app.api.subtask.schema import (
 from app.api.standard_response import success_response
 
 
-router = APIRouter(tags=["Subtasks"])
-
+router = APIRouter(prefix="/api/v1", tags=["Subtasks"])
 
 def get_subtask_use_case(db: AsyncSession = Depends(get_db)) -> SubtaskUseCase:
     return SubtaskUseCase(db)

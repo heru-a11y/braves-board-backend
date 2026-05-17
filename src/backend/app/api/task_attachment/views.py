@@ -9,7 +9,7 @@ from app.api.task_attachment.use_cases import TaskAttachmentUseCase
 from app.api.exceptions.task_attachment_exceptions import AttachmentNotFoundException
 from app.api.standard_response import success_response
 
-router = APIRouter(prefix="/tasks", tags=["Task Attachments"])
+router = APIRouter(prefix="/api/v1/tasks", tags=["Task Attachments"])
 
 def get_task_attachment_use_case(db: AsyncSession = Depends(get_db)) -> TaskAttachmentUseCase:
     return TaskAttachmentUseCase(db)

@@ -8,7 +8,7 @@ from app.api.depedencies import get_current_user
 from app.models.user_model import User
 from app.api.standard_response import success_response
 
-router = APIRouter(prefix="/tasks", tags=["Task Comments"])
+router = APIRouter(prefix="/api/v1/tasks", tags=["Task Comments"])
 
 def get_task_comment_use_case(db: AsyncSession = Depends(get_db)) -> TaskCommentUseCase:
     return TaskCommentUseCase(db)

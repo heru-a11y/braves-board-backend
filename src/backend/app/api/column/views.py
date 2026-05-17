@@ -10,7 +10,7 @@ from app.models.user_model import User
 from app.api.standard_response import success_response
 
 
-router = APIRouter(prefix="/columns", tags=["Columns"])
+router = APIRouter(prefix="/api/v1/columns", tags=["Columns"])
 
 
 def get_column_use_case(db: AsyncSession = Depends(get_db)) -> ColumnUseCase:
