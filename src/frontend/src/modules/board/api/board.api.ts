@@ -5,7 +5,7 @@ import axios from 'axios'
 import api from '../../../app/api'
 
 // http — axios instance khusus untuk endpoint yang tidak pakai /api/v1
-const http = axios.create({ baseURL: 'http://localhost:8000' })
+const http = axios.create({ baseURL: 'http://localhost:8000/api/v1' })
 http.interceptors.request.use((config) => {
   const token = localStorage.getItem('access_token')
   if (token) config.headers.Authorization = `Bearer ${token}`
